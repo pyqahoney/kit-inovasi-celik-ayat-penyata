@@ -47,24 +47,241 @@ class SoundController {
     return this.bgmAudio;
   }
 
-  // Start background music (Relaxing Nintendo Café Music)
-  startBGM() {
-    if (!this.enabled) return;
-    const audio = this.getBGMAudio();
-    if (!audio) return;
+  // Current active BGM module: 'default' | 'frog' | 'mario' | 'treasure'
+  public currentModule: 'default' | 'frog' | 'mario' | 'treasure' = 'default';
+  private synthLoopTimer: number | null = null;
+  private synthStep: number = 0;
 
-    this.isBGMPlaying = true;
-    audio.volume = this.isSpeaking ? this.DUCKED_BGM_VOLUME : this.NORMAL_BGM_VOLUME;
-    audio.play().catch(() => {
-      // Browser autoplay policy might await user click/gesture
-    });
+  // Start background music based on current module
+  startBGM() {
+    this.playModuleBGM(this.currentModule);
   }
 
-  // Stop background music
+  // Set and play module-specific BGM
+  playModuleBGM(module: 'default' | 'frog' | 'mario' | 'treasure') {
+    this.currentModule = module;
+    if (!this.enabled) return;
+
+    // Stop existing audio element and synth loop
+    this.stopSynthBGM();
+    if (this.bgmAudio) {
+      this.bgmAudio.pause();
+    }
+
+    this.isBGMPlaying = true;
+
+    if (module === 'default') {
+      const audio = this.getBGMAudio();
+      if (audio) {
+        audio.volume = this.isSpeaking ? this.DUCKED_BGM_VOLUME : this.NORMAL_BGM_VOLUME;
+        audio.play().catch(() => {});
+      }
+    } else if (module === 'mario') {
+      this.startMarioBGM();
+    } else if (module === 'frog') {
+      this.startFrogBGM();
+    } else if (module === 'treasure') {
+      this.startTreasureBGM();
+    }
+  }
+
+  // Stop all background music (both audio element and synthesized loops)
   stopBGM() {
     this.isBGMPlaying = false;
     if (this.bgmAudio) {
       this.bgmAudio.pause();
+    }
+    this.stopSynthBGM();
+  }
+
+  private stopSynthBGM() {
+    if (this.synthLoopTimer !== null) {
+      clearInterval(this.synthLoopTimer);
+      this.synthLoopTimer = null;
+    }
+    this.synthStep = 0;
+  }
+
+  // 1. Super Mario Bros 8-Bit Chiptune Overworld Theme Synthesizer
+  private startMarioBGM() {
+    this.stopSynthBGM();
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    // Authentic Super Mario Overworld Theme sequence [freq, duration, type, isBass]
+    // Tempo ~ 150ms per 16th note
+    const marioNotes: Array<{ f: number; d: number; b?: number }> = [
+      // Intro phrase: E5, E5, rest, E5, rest, C5, E5, rest, G5, rest, G4
+      { f: 659.25, d: 0.12, b: 164.81 }, // E5
+      { f: 659.25, d: 0.12, b: 164.81 }, // E5
+      { f: 0, d: 0.12 },
+      { f: 659.25, d: 0.12, b: 164.81 }, // E5
+      { f: 0, d: 0.12 },
+      { f: 523.25, d: 0.12, b: 130.81 }, // C5
+      { f: 659.25, d: 0.18, b: 164.81 }, // E5
+      { f: 0, d: 0.12 },
+      { f: 783.99, d: 0.24, b: 196.00 }, // G5
+      { f: 0, d: 0.24 },
+      { f: 392.00, d: 0.26, b: 98.00 },  // G4 (low)
+      { f: 0, d: 0.28 },
+
+      // Main Loop Motif A: C5, rest, G4, rest, E4, rest, A4, B4, Bb4, A4
+      { f: 523.25, d: 0.16, b: 130.81 }, // C5
+      { f: 0, d: 0.12 },
+      { f: 392.00, d: 0.16, b: 98.00 },  // G4
+      { f: 0, d: 0.12 },
+      { f: 329.63, d: 0.16, b: 82.41 },  // E4
+      { f: 0, d: 0.12 },
+      { f: 440.00, d: 0.15, b: 110.00 }, // A4
+      { f: 493.88, d: 0.15, b: 123.47 }, // B4
+      { f: 466.16, d: 0.14, b: 116.54 }, // Bb4
+      { f: 440.00, d: 0.18, b: 110.00 }, // A4
+      { f: 392.00, d: 0.16, b: 98.00 },  // G4
+      { f: 659.25, d: 0.18, b: 164.81 }, // E5
+      { f: 783.99, d: 0.18, b: 196.00 }, // G5
+      { f: 880.00, d: 0.22, b: 220.00 }, // A5
+      { f: 698.46, d: 0.15, b: 174.61 }, // F5
+      { f: 783.99, d: 0.16, b: 196.00 }, // G5
+      { f: 659.25, d: 0.18, b: 164.81 }, // E5
+      { f: 523.25, d: 0.15, b: 130.81 }, // C5
+      { f: 587.33, d: 0.15, b: 146.83 }, // D5
+      { f: 493.88, d: 0.24, b: 123.47 }, // B4
+      { f: 0, d: 0.24 }
+    ];
+
+    let noteIdx = 0;
+    const tickTime = 160; // ms
+
+    this.synthLoopTimer = window.setInterval(() => {
+      if (!this.enabled || !this.isBGMPlaying || this.currentModule !== 'mario') return;
+      const cur = marioNotes[noteIdx];
+      noteIdx = (noteIdx + 1) % marioNotes.length;
+
+      if (cur.f > 0) {
+        const vol = this.isSpeaking ? 0.02 : 0.08;
+        // Melody (Square wave chiptune)
+        this.playCustomTone(cur.f, 'square', cur.d, vol);
+        // Bassline
+        if (cur.b) {
+          this.playCustomTone(cur.b, 'triangle', cur.d + 0.02, vol * 0.9);
+        }
+      }
+    }, tickTime);
+  }
+
+  // 2. Jom Selamatkan Si Katak Playful Bouncy Pond Melody
+  private startFrogBGM() {
+    this.stopSynthBGM();
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    // Cheerful, bouncy pond-hopping melody with marimba tones & syncopated bass
+    const frogNotes: Array<{ f: number; d: number; b?: number }> = [
+      { f: 523.25, d: 0.14, b: 130.81 }, // C5
+      { f: 659.25, d: 0.14, b: 130.81 }, // E5
+      { f: 783.99, d: 0.16, b: 196.00 }, // G5
+      { f: 880.00, d: 0.20, b: 220.00 }, // A5
+      { f: 0, d: 0.12 },
+      { f: 783.99, d: 0.14, b: 196.00 }, // G5
+      { f: 659.25, d: 0.16, b: 164.81 }, // E5
+      { f: 523.25, d: 0.22, b: 130.81 }, // C5
+      { f: 0, d: 0.14 },
+      { f: 587.33, d: 0.14, b: 146.83 }, // D5
+      { f: 698.46, d: 0.14, b: 174.61 }, // F5
+      { f: 783.99, d: 0.18, b: 196.00 }, // G5
+      { f: 880.00, d: 0.16, b: 220.00 }, // A5
+      { f: 987.77, d: 0.24, b: 246.94 }, // B5
+      { f: 1046.50, d: 0.26, b: 261.63 }, // C6
+      { f: 0, d: 0.20 }
+    ];
+
+    let noteIdx = 0;
+    const tickTime = 180; // ms
+
+    this.synthLoopTimer = window.setInterval(() => {
+      if (!this.enabled || !this.isBGMPlaying || this.currentModule !== 'frog') return;
+      const cur = frogNotes[noteIdx];
+      noteIdx = (noteIdx + 1) % frogNotes.length;
+
+      if (cur.f > 0) {
+        const vol = this.isSpeaking ? 0.02 : 0.07;
+        // Marimba-like sine/triangle
+        this.playCustomTone(cur.f, 'triangle', cur.d, vol);
+        if (cur.b) {
+          this.playCustomTone(cur.b, 'sine', cur.d + 0.04, vol * 1.1);
+        }
+      }
+    }, tickTime);
+  }
+
+  // 3. Permainan Harta Karun Swashbuckling Pirate Sea Shanty 6/8 Melody
+  private startTreasureBGM() {
+    this.stopSynthBGM();
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    // Sea shanty accordion / trumpet pirate rhythm in 6/8 (D minor adventure)
+    const pirateNotes: Array<{ f: number; d: number; b?: number }> = [
+      { f: 293.66, d: 0.22, b: 146.83 }, // D4
+      { f: 349.23, d: 0.20, b: 174.61 }, // F4
+      { f: 440.00, d: 0.26, b: 220.00 }, // A4
+      { f: 523.25, d: 0.20, b: 220.00 }, // C5
+      { f: 440.00, d: 0.24, b: 146.83 }, // A4
+      { f: 0, d: 0.12 },
+      { f: 392.00, d: 0.20, b: 196.00 }, // G4
+      { f: 440.00, d: 0.20, b: 220.00 }, // A4
+      { f: 349.23, d: 0.28, b: 174.61 }, // F4
+      { f: 293.66, d: 0.32, b: 146.83 }, // D4
+      { f: 0, d: 0.16 },
+      { f: 329.63, d: 0.22, b: 164.81 }, // E4
+      { f: 349.23, d: 0.22, b: 174.61 }, // F4
+      { f: 392.00, d: 0.26, b: 196.00 }, // G4
+      { f: 440.00, d: 0.32, b: 220.00 }, // A4
+      { f: 0, d: 0.22 }
+    ];
+
+    let noteIdx = 0;
+    const tickTime = 220; // ms
+
+    this.synthLoopTimer = window.setInterval(() => {
+      if (!this.enabled || !this.isBGMPlaying || this.currentModule !== 'treasure') return;
+      const cur = pirateNotes[noteIdx];
+      noteIdx = (noteIdx + 1) % pirateNotes.length;
+
+      if (cur.f > 0) {
+        const vol = this.isSpeaking ? 0.02 : 0.075;
+        // Sawtooth with low-pass / brass accordion resonance
+        this.playCustomTone(cur.f, 'sawtooth', cur.d, vol * 0.85);
+        if (cur.b) {
+          this.playCustomTone(cur.b, 'triangle', cur.d + 0.05, vol);
+        }
+      }
+    }, tickTime);
+  }
+
+  // Helper for custom tone with custom volume
+  private playCustomTone(freq: number, type: OscillatorType, duration: number, volume = 0.08) {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+      gain.gain.setValueAtTime(volume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch {
+      // Audio might be blocked
     }
   }
 

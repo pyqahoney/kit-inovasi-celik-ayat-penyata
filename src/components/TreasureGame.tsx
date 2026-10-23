@@ -131,6 +131,14 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   const [coinAnimating, setCoinAnimating] = useState(false);
   const [scoreEmergeAnim, setScoreEmergeAnim] = useState(true);
 
+  // Play Pirate Adventure Module BGM on mount and restore default on unmount
+  useEffect(() => {
+    sound.playModuleBGM('treasure');
+    return () => {
+      sound.playModuleBGM('default');
+    };
+  }, []);
+
   // Animate score popping out of the mission treasure chest whenever a new question loads
   useEffect(() => {
     if (stage === 'playing') {

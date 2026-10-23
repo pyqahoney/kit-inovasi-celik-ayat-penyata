@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
-import { CatVector, BoyVector } from './IllustratedCharacters';
-import { CuteSunVector, ButterflyVector, FoliageForeground } from './StoryGraphics';
+import { TopNavBar, WoodArrowButton } from './OrganicNav';
 import { sound } from '../utils/audio';
+import { TeacherStandee, TeacherId, TEACHER_PROFILES } from './TeacherCharacters';
 
 interface LatihDiriProps {
   onBack: () => void;
   onComplete: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  teacherId?: TeacherId;
 }
 
 const DRILL_QUESTIONS = [
@@ -67,7 +67,8 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
   onBack,
   onComplete,
   soundEnabled,
-  onToggleSound
+  onToggleSound,
+  teacherId = 'syafiqah'
 }) => {
   const [step, setStep] = useState<'intro' | 'question' | 'congrats'>('intro');
   const [qIndex, setQIndex] = useState(0);
@@ -77,7 +78,7 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
   const cur = DRILL_QUESTIONS[qIndex];
 
   const handleReveal = () => {
-    sound.playSuccess();
+    sound.playApplause();
     setShowAnswer(true);
   };
 
@@ -94,6 +95,7 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
         setUserChoice(null);
       } else {
         setStep('congrats');
+        sound.playApplause();
         sound.playFanfare();
         onComplete();
         try {
@@ -139,21 +141,25 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
       {/* Intro Screen (Page 17) */}
       {step === 'intro' && (
         <div className="flex-1 flex flex-col items-center justify-center my-4 animate-fade-in text-center">
-          <h1 className="text-4xl sm:text-6xl font-black font-heading text-slate-900 tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-black font-heading text-slate-900 tracking-tight mb-2">
             Latih Diri
           </h1>
-          <p className="text-amber-800 text-lg sm:text-2xl font-heading font-bold max-w-lg leading-relaxed mb-6">
+          <p className="text-amber-800 text-base sm:text-xl font-heading font-bold max-w-lg leading-relaxed mb-4">
             “Jom kukuhkan pengetahuan dengan menjawab 5 soalan berkenaan ayat perintah”
           </p>
 
-          <div className="flex items-center justify-center gap-6 my-2">
-            <CatVector size={130} />
-            <BoyVector pose="flag" size={150} />
+          <div className="my-2">
+            <TeacherStandee
+              teacherId={teacherId}
+              size="lg"
+              showBubble={true}
+              bubbleText={`“Sila pilih jawapan yang paling tepat bagi setiap soalan. Bersedia bersama ${TEACHER_PROFILES[teacherId].nama}?”`}
+            />
           </div>
 
           <button
             onClick={handleNext}
-            className="mt-6 px-8 py-3.5 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-heading font-extrabold text-lg shadow-[0_6px_0_#b45309] active:translate-y-1 active:shadow-[0_2px_0_#b45309] transition-all transform hover:scale-105"
+            className="mt-4 px-8 py-3.5 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-heading font-extrabold text-lg shadow-[0_6px_0_#b45309] active:translate-y-1 active:shadow-[0_2px_0_#b45309] transition-all transform hover:scale-105"
           >
             Mula Latihan 💡
           </button>
@@ -206,7 +212,7 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                     sound.playClick();
                     setUserChoice(c);
                   }}
-                  className={`px-4 py-2 rounded-xl text-sm font-heading font-bold border-2 transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-heading font-bold border-2 transition-all cursor-pointer ${
                     userChoice === c
                       ? 'bg-amber-500 text-white border-amber-600 scale-105 shadow-md'
                       : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
@@ -217,22 +223,24 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
               ))}
             </div>
 
-            {/* Pink Jawapan Reveal Button matching storyboard */}
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Jawapan Reveal Button */}
+            <div className="mt-6 flex items-center justify-center">
               <button
                 onClick={handleReveal}
-                className="px-8 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 active:scale-95 text-white font-heading font-black text-xl shadow-[0_5px_0_#9d174d] active:shadow-[0_1px_0_#9d174d] active:translate-y-1 transition-all"
+                className="px-8 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 active:scale-95 text-white font-heading font-black text-xl shadow-[0_5px_0_#9d174d] active:shadow-[0_1px_0_#9d174d] active:translate-y-1 transition-all cursor-pointer"
               >
-                {showAnswer ? '✓ Jawapan Didedahkan' : 'jawapan'}
+                {showAnswer ? '✓ Jawapan Didedahkan' : 'Semak Jawapan'}
               </button>
-
-              <AudioSpeakerButton textToSpeak={cur.fullSentence} size="lg" label="Dengar" />
             </div>
           </div>
 
-          {/* Cute Cat vector at the bottom as shown in storyboard */}
-          <div className="flex justify-center -mb-2">
-            <CatVector size={110} />
+          {/* Teacher Guide mini standee at bottom */}
+          <div className="flex justify-center -mb-2 mt-2">
+            <div className="flex items-center gap-2 bg-white/90 px-4 py-1.5 rounded-full border border-amber-300 shadow-sm">
+              <span className="text-xs font-bold text-amber-900 font-heading">
+                Guru Pembimbing: {TEACHER_PROFILES[teacherId].nama}
+              </span>
+            </div>
           </div>
         </div>
       )}

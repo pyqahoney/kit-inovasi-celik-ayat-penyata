@@ -9,11 +9,11 @@ export interface TeacherProfile {
   nama: string;
   gelaran: string;
   peranan: string;
-  pakaian: string;
   kepakaran: string;
   fotoUrl: string;
   avatarUrl: string;
   fullGraphicUrl: string;
+  soloPhotoUrl: string;
   groupGraphicUrl: string;
   ucapanMesra: string;
   faktaMenarik: string;
@@ -31,17 +31,17 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   syafiqah: {
     id: 'syafiqah',
     nama: 'Cikgu Syafiqah',
-    gelaran: 'Cikgu Bertudung',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Ayat Silaan & Permintaan',
-    pakaian: 'Baju Kurung Ungu Lavender Berbunga & Bertudung Sopan',
+    gelaran: 'Pakar Pedagogi PdP',
+    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Pedagogi PdP',
     kepakaran: 'Ayat Silaan, Ayat Permintaan & Kesantunan Bahasa',
-    fotoUrl: '/assets/aistudio/cikgu_syafiqah_avatar.png',
-    avatarUrl: '/assets/aistudio/cikgu_syafiqah_avatar.png',
-    fullGraphicUrl: '/assets/aistudio/cikgu_syafiqah_full.png',
+    fotoUrl: '/assets/aistudio/cikgu_syafiqah_avatar_clean.png',
+    avatarUrl: '/assets/aistudio/cikgu_syafiqah_avatar_clean.png',
+    fullGraphicUrl: '/assets/aistudio/cikgu_syafiqah_clean.png',
+    soloPhotoUrl: '/assets/aistudio/cikgu_syafiqah_clean.png',
     groupGraphicUrl: '/assets/aistudio/Gemini_Generated_Image_whsn1owhsn1owhsn_b0b267ce.jpg',
     ucapanMesra:
       'Salam sejahtera dan salam sayang anak-anak murid yang pintar! Saya Cikgu Syafiqah. Mari kita terokai ayat silaan dan permintaan dengan santun dan beradab.',
-    faktaMenarik: 'Suka bercerita dengan nada yang lemah lembut, sabar membimbing murid sehingga faham.',
+    faktaMenarik: 'Suka membimbing murid dengan sabar dan menerapkan nilai kesantunan berbahasa.',
     temaWarna: {
       bg: 'bg-purple-50',
       border: 'border-purple-400',
@@ -54,17 +54,17 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   aaron: {
     id: 'aaron',
     nama: 'Cikgu Aaron',
-    gelaran: 'Cikgu Lelaki',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Ayat Suruhan & Tatabahasa',
-    pakaian: 'Baju Kemeja Biru Kemas, Tali Leher & Seluar Hitam',
+    gelaran: 'Guru Bahasa Melayu',
+    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Ayat Suruhan',
     kepakaran: 'Ayat Suruhan, Struktur Ayat & Tatabahasa Baku',
-    fotoUrl: '/assets/aistudio/cikgu_aaron_avatar.png',
-    avatarUrl: '/assets/aistudio/cikgu_aaron_avatar.png',
-    fullGraphicUrl: '/assets/aistudio/cikgu_aaron_full.png',
+    fotoUrl: '/assets/aistudio/cikgu_aaron_avatar_clean.png',
+    avatarUrl: '/assets/aistudio/cikgu_aaron_avatar_clean.png',
+    fullGraphicUrl: '/assets/aistudio/cikgu_aaron_clean.png',
+    soloPhotoUrl: '/assets/aistudio/cikgu_aaron_clean.png',
     groupGraphicUrl: '/assets/aistudio/Gemini_Generated_Image_whsn1owhsn1owhsn_b0b267ce.jpg',
     ucapanMesra:
       'Salam sejahtera semua wira cilik! Saya Cikgu Aaron. Siap sedia untuk cabaran tatabahasa ayat perintah hari ini? Ayuh kita buktikan ketangkasan anda!',
-    faktaMenarik: 'Penuh bersemangat, suka aktiviti berformat cabaran permainan dan membina keyakinan murid.',
+    faktaMenarik: 'Penuh bersemangat, suka aktiviti cabaran tatabahasa dan memupuk keyakinan murid.',
     temaWarna: {
       bg: 'bg-sky-50',
       border: 'border-sky-400',
@@ -77,13 +77,13 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   freshcy: {
     id: 'freshcy',
     nama: 'Cikgu Freshcy',
-    gelaran: 'Cikgu Perempuan',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Ayat Larangan & Inovasi',
-    pakaian: 'Baju Kurung Biru Muda Berbunga & Rambut Beralun Anggun',
+    gelaran: 'Inovator Digital PdP',
+    peranan: 'Guru Bahasa Melayu Tahun 5 & Inovator Digital PdP',
     kepakaran: 'Ayat Larangan, Aktiviti Interaktif & Gamifikasi',
-    fotoUrl: '/assets/aistudio/cikgu_freshcy_avatar.png',
-    avatarUrl: '/assets/aistudio/cikgu_freshcy_avatar.png',
-    fullGraphicUrl: '/assets/aistudio/cikgu_freshcy_full.png',
+    fotoUrl: '/assets/aistudio/cikgu_freshcy_avatar_clean.png',
+    avatarUrl: '/assets/aistudio/cikgu_freshcy_avatar_clean.png',
+    fullGraphicUrl: '/assets/aistudio/cikgu_freshcy_clean.png',
+    soloPhotoUrl: '/assets/aistudio/cikgu_freshcy_clean.png',
     groupGraphicUrl: '/assets/aistudio/Gemini_Generated_Image_whsn1owhsn1owhsn_b0b267ce.jpg',
     ucapanMesra:
       'Hai anak-anak riang dan cemerlang! Saya Cikgu Freshcy. Jom kita bezakan ayat larangan dengan tepat sambil mengumpul banyak syiling emas!',
@@ -154,7 +154,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
         interactive ? 'cursor-pointer group' : ''
       } ${className}`}
       onClick={interactive ? handleTeacherClick : undefined}
-      title={`${profile.nama} - ${profile.pakaian}`}
+      title={`${profile.nama} - ${profile.gelaran}`}
     >
       {/* Animated Speech Bubble */}
       {showBubble && (
@@ -226,7 +226,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
         {/* Shadow Pedestal */}
         <div className="w-24 h-3 bg-black/20 rounded-full blur-xs -mt-1 pointer-events-none" />
 
-        {/* Name Plate & Attire Label */}
+        {/* Name Plate & Role Label */}
         <div className="mt-1 flex flex-col items-center text-center">
           <span
             className={`px-2.5 py-0.5 rounded-full text-xs font-heading font-black border ${profile.temaWarna.badge} shadow-xs flex items-center gap-1.5`}
@@ -237,7 +237,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
             <span>{profile.nama}</span>
           </span>
           <span className="text-[10px] text-slate-600 font-semibold mt-0.5 max-w-[170px] leading-tight">
-            {profile.pakaian}
+            {profile.gelaran}
           </span>
         </div>
       </div>
@@ -264,7 +264,7 @@ export const TeacherAvatar: React.FC<{
       className={`rounded-full overflow-hidden shrink-0 ${sizeClasses} ${
         withBorder ? `border-2 ${profile.temaWarna.border} shadow-sm` : ''
       } ${className}`}
-      title={`${profile.nama} - ${profile.pakaian}`}
+      title={`${profile.nama} - ${profile.gelaran}`}
     >
       <img
         src={profile.avatarUrl}
@@ -365,7 +365,7 @@ export const TeacherTrioShowcase: React.FC<{
                   <span>{profile.nama}</span>
                 </h4>
                 <p className="text-[11px] font-bold text-amber-800 leading-tight mt-0.5">
-                  {profile.pakaian}
+                  {profile.gelaran}
                 </p>
                 <p className="text-[10px] text-slate-600 mt-1 line-clamp-2">
                   {profile.kepakaran}

@@ -139,9 +139,10 @@ export default function App() {
   };
 
   const handleEmotionSelect = (type: 'happy' | 'thoughtful') => {
+    const teacherName = TEACHER_PROFILES[selectedTeacherId].nama;
     if (type === 'happy') {
       sound.playSuccess();
-      const textToSpeak = 'Hebat! Awak ceria dan pintar. Jom terokai ayat perintah bersama Cikgu Syafiqah!';
+      const textToSpeak = `Hebat! Awak ceria dan pintar. Jom terokai ayat perintah bersama ${teacherName}!`;
       setEncouragementData({
         type: 'happy',
         tajuk: 'Hebat & Ceria! 🌟',
@@ -151,7 +152,7 @@ export default function App() {
       });
     } else {
       sound.playTone(400, 'sine', 0.2);
-      const textToSpeak = 'Awak boleh! Jangan risau sahabat kecil, Cikgu Syafiqah sentiasa ada bersamamu.';
+      const textToSpeak = `Awak boleh! Jangan risau sahabat kecil, ${teacherName} sentiasa ada bersamamu.`;
       setEncouragementData({
         type: 'thoughtful',
         tajuk: 'Awak Boleh! 🌈',
@@ -330,10 +331,10 @@ export default function App() {
               className="flex items-center gap-2 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-500 rounded-2xl shadow-xs transition-all text-left cursor-pointer group"
               title="Peranan Semasa: Guru (Tekan untuk tukar peranan)"
             >
-              <TeacherAvatar teacherId="syafiqah" size="sm" withBorder={false} />
+              <TeacherAvatar teacherId={selectedTeacherId} size="sm" withBorder={false} />
               <div>
                 <span className="text-xs font-heading font-black text-emerald-950 block leading-tight">
-                  Mod Guru (Cikgu Syafiqah)
+                  Mod Guru ({TEACHER_PROFILES[selectedTeacherId].nama})
                 </span>
                 <span className="text-[10px] text-emerald-800 font-bold block">
                   Akses Pentaksiran & Analisis PBS · Tukar ▼
@@ -393,7 +394,7 @@ export default function App() {
               setShowTeacherTrioModal(true);
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 hover:bg-white border-2 border-amber-400 rounded-2xl shadow-xs transition-all cursor-pointer group"
-            title={`Guru Pembimbing: ${TEACHER_PROFILES[selectedTeacherId].nama} (${TEACHER_PROFILES[selectedTeacherId].pakaian}) - Tekan untuk tukar guru`}
+            title={`Guru Pembimbing: ${TEACHER_PROFILES[selectedTeacherId].nama} (${TEACHER_PROFILES[selectedTeacherId].gelaran}) - Tekan untuk tukar guru`}
           >
             <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-amber-400 shrink-0 bg-amber-100">
               <img
@@ -553,7 +554,7 @@ export default function App() {
                   className="group p-3.5 rounded-3xl bg-gradient-to-b from-emerald-500 to-teal-700 hover:from-emerald-400 hover:to-teal-600 text-white font-heading border-3 border-emerald-300 shadow-[0_5px_0_#065f46] active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
                 >
                   <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-xs mb-1.5 group-hover:rotate-6 transition-transform bg-purple-100">
-                    <img src="/assets/aistudio/cikgu_syafiqah_avatar.png" alt="Akses Guru" className="w-full h-full object-cover" />
+                    <img src={TEACHER_PROFILES[selectedTeacherId].avatarUrl} alt="Akses Guru" className="w-full h-full object-cover" />
                   </div>
                   <span className="text-base font-black text-white drop-shadow-xs">Akses Guru</span>
                   <span className="text-[10px] font-bold text-emerald-100 bg-emerald-950/40 px-2 py-0.5 rounded-full mt-1 flex items-center gap-1">
@@ -622,7 +623,7 @@ export default function App() {
                               ? 'bg-amber-500 text-white shadow-xs scale-105'
                               : 'text-slate-700 hover:bg-amber-100'
                           }`}
-                          title={`${prof.nama} (${prof.pakaian})`}
+                          title={`${prof.nama} (${prof.gelaran})`}
                         >
                           <span className="w-3.5 h-3.5 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
                             <img src={prof.avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -900,10 +901,20 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Characters: Boy with binoculars & white bunny */}
-              <div className="w-full flex items-end justify-between px-6 sm:px-12 -mb-2 mt-4">
-                <BoyVector pose="binoculars" size={130} />
-                <BunnyVector size={95} />
+              {/* Characters: Boy with binoculars, Selected Teacher Standee & white bunny */}
+              <div className="w-full flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-10 -mb-2 mt-4 gap-3">
+                <div className="hidden sm:block">
+                  <BoyVector pose="binoculars" size={120} />
+                </div>
+                <TeacherStandee
+                  teacherId={selectedTeacherId}
+                  size="sm"
+                  showBubble={true}
+                  bubbleText={`“Fahami makna 6 simbol ini agar mudah mengemudi modul bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
+                />
+                <div className="hidden sm:block">
+                  <BunnyVector size={90} />
+                </div>
               </div>
             </div>
 
@@ -971,7 +982,7 @@ export default function App() {
                             ? `${prof.temaWarna.badge} font-black shadow-xs ring-2 ring-amber-400 scale-105`
                             : 'bg-slate-100 text-slate-700 hover:bg-amber-100'
                         }`}
-                        title={`${prof.nama} (${prof.pakaian})`}
+                        title={`${prof.nama} (${prof.gelaran})`}
                       >
                         <span className="w-5 h-5 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
                           <img src={prof.fotoUrl} alt="" className="w-full h-full object-cover object-top" />
@@ -1197,11 +1208,17 @@ export default function App() {
             />
 
             <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-4 z-10">
-              {/* Left Side: Explorer Boy with magnifying glass & cat */}
+              {/* Left Side: Selected Teacher Standee & Explorer Boy */}
               <div className="flex flex-col items-center">
-                <BoyVector pose="magnify" size={150} />
-                <div className="mt-2">
-                  <CatVector size={110} />
+                <TeacherStandee
+                  teacherId={selectedTeacherId}
+                  size="md"
+                  showBubble={true}
+                  bubbleText={`“Sila pilih bahagian yang ingin anda terokai bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
+                />
+                <div className="hidden sm:flex items-center gap-2 mt-2">
+                  <BoyVector pose="magnify" size={80} />
+                  <CatVector size={60} />
                 </div>
               </div>
 
@@ -1315,9 +1332,41 @@ export default function App() {
             />
 
             <div className="flex-1 flex flex-col items-center justify-center my-4 animate-fade-in z-10">
-              <h1 className="text-4xl sm:text-5xl font-black font-heading text-slate-900 mb-6 drop-shadow-sm">
+              <h1 className="text-4xl sm:text-5xl font-black font-heading text-slate-900 mb-3 drop-shadow-sm">
                 Kuiz & Permainan
               </h1>
+
+              {/* Selected Teacher Guidance Banner */}
+              <div className="flex items-center gap-3 mb-5 px-4 py-2.5 bg-white/95 rounded-2xl border-2 border-amber-300 shadow-md max-w-xl w-full">
+                <TeacherAvatar teacherId={selectedTeacherId} size="md" />
+                <div className="text-left flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-heading font-black text-amber-950">
+                      {TEACHER_PROFILES[selectedTeacherId].nama}
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-300">
+                      {TEACHER_PROFILES[selectedTeacherId].gelaran}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 font-medium leading-snug mt-0.5">
+                    “Pilih permainan kegemaran anda dan kumpul sebanyak mungkin syiling emas!”
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    sound.speakMalay(
+                      `Ayuh murid-murid! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Pilih salah satu permainan kegemaran anda dan kumpulkan syiling emas!`,
+                      selectedTeacherId
+                    );
+                  }}
+                  className="p-2 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 cursor-pointer shadow-xs active:scale-95 transition-all"
+                  title={`Dengar nasihat ${TEACHER_PROFILES[selectedTeacherId].nama}`}
+                >
+                  <Volume2 size={15} />
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full">
                 {/* Game 1 Card: Lompat Si Katak Lompat matching Page 24 */}
@@ -1545,6 +1594,7 @@ export default function App() {
            ======================================================== */}
         {currentScreen === 'drill' && (
           <LatihDiri
+            teacherId={selectedTeacherId}
             onBack={() => setCurrentScreen('learn_menu')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
@@ -1559,6 +1609,7 @@ export default function App() {
            ======================================================== */}
         {currentScreen === 'ar_scanner' && (
           <ARModule
+            teacherId={selectedTeacherId}
             onBack={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
@@ -1666,11 +1717,11 @@ export default function App() {
                 }`}
               >
                 <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-emerald-500 shrink-0 bg-purple-100">
-                  <img src="/assets/aistudio/cikgu_syafiqah_avatar.png" alt="Guru" className="w-full h-full object-cover" />
+                  <img src={TEACHER_PROFILES[selectedTeacherId].avatarUrl} alt="Guru" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-heading font-black text-slate-900 text-sm">Akses Guru (Cikgu Syafiqah)</span>
+                    <span className="font-heading font-black text-slate-900 text-sm">Akses Guru ({TEACHER_PROFILES[selectedTeacherId].nama})</span>
                     {userRole === 'teacher' && (
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Aktif</span>
                     )}

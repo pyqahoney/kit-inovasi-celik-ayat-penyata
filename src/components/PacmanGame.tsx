@@ -37,7 +37,7 @@ const POWER_CHALLENGES: PowerPelletChallenge[] = [
     jenis: 'Ayat Suruhan',
     warna: '#ef4444', // Red
     simbol: '⚡',
-    soalan: 'Lengkapkan ayat suruhan ini untuk memberi arahan kepada murid:',
+    soalan: 'Pilih ayat suruhan',
     ayatPenuh: 'Sediakan buku catatan Bahasa Melayu kamu sebelum kelas bermula.',
     pilihan: [
       { teks: 'Sediakan buku catatan kamu sebelum kelas bermula.', betul: true, maklumBalas: 'Tepat sekali! "Sediakan" ialah kata perintah suruhan yang jelas.' },
@@ -50,7 +50,7 @@ const POWER_CHALLENGES: PowerPelletChallenge[] = [
     jenis: 'Ayat Larangan',
     warna: '#a855f7', // Purple
     simbol: '⛔',
-    soalan: 'Pilih ayat larangan yang melarang perbuatan berbahaya:',
+    soalan: 'Pilih ayat larangan',
     ayatPenuh: 'Jangan sesekali bermain di kawasan landasan kereta api itu.',
     pilihan: [
       { teks: 'Tolong belikan saya pensel warna.', betul: false, maklumBalas: 'Salah. "Tolong" ialah kata perintah permintaan.' },
@@ -63,7 +63,7 @@ const POWER_CHALLENGES: PowerPelletChallenge[] = [
     jenis: 'Ayat Silaan',
     warna: '#10b981', // Green
     simbol: '🌟',
-    soalan: 'Ayat manakah yang menjemput tetamu dengan sopan (Ayat Silaan)?',
+    soalan: 'Pilih ayat silaan',
     ayatPenuh: 'Jemputlah masuk ke dalam dewan dan nikmati hidangan kuih-muih ini.',
     pilihan: [
       { teks: 'Jemputlah masuk dan nikmati hidangan kuih-muih ini.', betul: true, maklumBalas: 'Cemerlang! "Jemput" dan "Sila" ialah kata silaan untuk menjemput orang.' },
@@ -76,7 +76,7 @@ const POWER_CHALLENGES: PowerPelletChallenge[] = [
     jenis: 'Ayat Permintaan',
     warna: '#3b82f6', // Blue
     simbol: '💫',
-    soalan: 'Kenal pasti ayat permintaan yang memohon bantuan dengan tertib:',
+    soalan: 'Pilih ayat permintaan',
     ayatPenuh: 'Minta semua hadirin berdiri tegak semasa lagu Negaraku dinyanyikan.',
     pilihan: [
       { teks: 'Minta semua hadirin berdiri tegak semasa lagu Negaraku dimainkan.', betul: true, maklumBalas: 'Hebat! "Minta" dan "Tolong" digunakan untuk memohon pertolongan/keizinan.' },

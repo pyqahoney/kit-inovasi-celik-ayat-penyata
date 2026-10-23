@@ -215,16 +215,16 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.speakMalay('Saya Cikgu Syafiqah. Saya memantau penguasaan murid dalam aspek adab dan kesantunan ayat silaan dan permintaan.', 'syafiqah');
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Syafiqah (Baju Kurung Ungu & Bertudung)"
+            title="Tekan untuk dengar audio Cikgu Syafiqah (Guru Bahasa Melayu · Pakar Pedagogi PdP)"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-purple-400 shrink-0">
-              <img src="/assets/aistudio/cikgu_syafiqah_avatar.png" alt="Cikgu Syafiqah" className="w-full h-full object-cover" />
+              <img src="/assets/aistudio/cikgu_syafiqah_avatar_clean.png" alt="Cikgu Syafiqah" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-heading font-black text-purple-950 flex items-center gap-1 leading-tight">
                 Cikgu Syafiqah <Volume2 size={11} className="text-purple-600" />
               </span>
-              <span className="text-[9px] text-purple-700 block leading-tight font-medium">Baju Kurung · Bertudung</span>
+              <span className="text-[9px] text-purple-700 block leading-tight font-medium">Guru BM · Pakar Pedagogi</span>
             </div>
           </button>
 
@@ -235,16 +235,16 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.speakMalay('Saya Cikgu Aaron. Saya menilai aspek ketepatan tatabahasa dan respons pantas murid terhadap ayat suruhan.', 'aaron');
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Aaron (Baju Kemeja Kemas)"
+            title="Tekan untuk dengar audio Cikgu Aaron (Guru Bahasa Melayu · Pakar Tatabahasa)"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-sky-400 shrink-0">
-              <img src="/assets/aistudio/cikgu_aaron_avatar.png" alt="Cikgu Aaron" className="w-full h-full object-cover" />
+              <img src="/assets/aistudio/cikgu_aaron_avatar_clean.png" alt="Cikgu Aaron" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-heading font-black text-sky-950 flex items-center gap-1 leading-tight">
                 Cikgu Aaron <Volume2 size={11} className="text-sky-600" />
               </span>
-              <span className="text-[9px] text-sky-700 block leading-tight font-medium">Baju Kemeja · Kemas</span>
+              <span className="text-[9px] text-sky-700 block leading-tight font-medium">Guru BM · Pakar Tatabahasa</span>
             </div>
           </button>
 
@@ -255,16 +255,16 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.speakMalay('Saya Cikgu Freshcy. Saya menyelia ketepatan pemahaman ayat larangan dan penglibatan aktif aktiviti interaktif.', 'freshcy');
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Freshcy (Baju Kurung Moden)"
+            title="Tekan untuk dengar audio Cikgu Freshcy (Inovator Digital PdP · Gamifikasi)"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-amber-400 shrink-0">
-              <img src="/assets/aistudio/cikgu_freshcy_avatar.png" alt="Cikgu Freshcy" className="w-full h-full object-cover" />
+              <img src="/assets/aistudio/cikgu_freshcy_avatar_clean.png" alt="Cikgu Freshcy" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-heading font-black text-amber-950 flex items-center gap-1 leading-tight">
                 Cikgu Freshcy <Volume2 size={11} className="text-amber-600" />
               </span>
-              <span className="text-[9px] text-amber-700 block leading-tight font-medium">Baju Kurung · Ceria</span>
+              <span className="text-[9px] text-amber-700 block leading-tight font-medium">Inovator Digital PdP</span>
             </div>
           </button>
         </div>

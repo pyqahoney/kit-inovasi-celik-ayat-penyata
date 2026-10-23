@@ -6,19 +6,22 @@ import { ARCard } from '../types';
 import { CikguVector, FrogVector, BoyVector } from './IllustratedCharacters';
 import { Camera, CameraOff, Sparkles, RefreshCw, Printer, Volume2, CheckCircle2 } from 'lucide-react';
 import { sound } from '../utils/audio';
+import { TEACHER_PROFILES, TeacherId } from './TeacherCharacters';
 
 interface ARModuleProps {
   onBack: () => void;
   onSessionComplete: (cardId: string) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  teacherId?: TeacherId;
 }
 
 export const ARModule: React.FC<ARModuleProps> = ({
   onBack,
   onSessionComplete,
   soundEnabled,
-  onToggleSound
+  onToggleSound,
+  teacherId = 'syafiqah'
 }) => {
   const [selectedCard, setSelectedCard] = useState<ARCard>(AR_FLASHCARDS_DATA[0]);
   const [cameraActive, setCameraActive] = useState(false);
@@ -173,8 +176,8 @@ export const ARModule: React.FC<ARModuleProps> = ({
               {selectedCard.id === 'ar-card-2' && (
                 <div className="h-44 sm:h-52 flex items-end justify-center filter drop-shadow-2xl">
                   <img
-                    src="/assets/aistudio/cikgu_syafiqah_full.png"
-                    alt="Cikgu Syafiqah"
+                    src={TEACHER_PROFILES[teacherId].fullGraphicUrl}
+                    alt={TEACHER_PROFILES[teacherId].nama}
                     className="h-full object-contain pointer-events-none"
                   />
                 </div>

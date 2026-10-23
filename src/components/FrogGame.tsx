@@ -99,6 +99,16 @@ export const FrogGame: React.FC<FrogGameProps> = ({
   const [selectedLeaf, setSelectedLeaf] = useState<string | null>(null);
   const [frogPosition, setFrogPosition] = useState<'bank' | 'A' | 'B' | 'C' | 'splash'>('bank');
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle');
+  const [flashRed, setFlashRed] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Play Frog Module BGM on mount and restore default on unmount
+  useEffect(() => {
+    sound.playModuleBGM('frog');
+    return () => {
+      sound.playModuleBGM('default');
+    };
+  }, []);
 
   // Augmented Reality (AR) States
   const [arMode, setArMode] = useState<boolean>(false);
@@ -220,6 +230,8 @@ export const FrogGame: React.FC<FrogGameProps> = ({
         sound.playWrong();
         setAnswerState('wrong');
         setFrogPosition('splash');
+        setFlashRed(true);
+        setTimeout(() => setFlashRed(false), 1000);
       }, 500);
     }
   };
@@ -264,7 +276,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
     setSubStage('intro');
   };
 
-  // Real-Time Optical Hand Tracking in Real World (Pengesan Tangan Alam Nyata)
+  // Real-Time Optical Hand Tracking in Real World (Pengesan Tangan Alam Nyata - Kurang Sensitif Warna)
   useEffect(() => {
     if (!arMode || !cameraActive || answerState !== 'idle' || subStage !== 'playing') {
       setDetectedHandZone(null);
@@ -302,12 +314,8 @@ export const FrogGame: React.FC<FrogGameProps> = ({
             const bDiff = Math.abs(data[idx + 2] - prevData[idx + 2]);
             const totalDiff = rDiff + gDiff + bDiff;
 
-            const r = data[idx];
-            const g = data[idx + 1];
-            const b = data[idx + 2];
-            const isSkin = r > 55 && g > 35 && b > 20 && r > g && g > b;
-
-            const weight = totalDiff > 35 ? 2 : (isSkin ? 1 : 0);
+            // Kurangkan sensitiviti terhadap warna: fokus pada pergerakan tangan fizikal yang jelas
+            const weight = totalDiff > 50 ? 2 : (totalDiff > 32 ? 1 : 0);
 
             if (weight > 0) {
               if (x >= 15 && x <= 55 && y >= 50) {
@@ -324,7 +332,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
       prevFrameDataRef.current = new Uint8ClampedArray(data);
 
-      const threshold = 16;
+      const threshold = 28;
       let foundZone: 'A' | 'B' | 'C' | null = null;
       let maxScore = threshold;
 
@@ -617,6 +625,15 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               ? 'border-amber-400 bg-black'
               : 'border-sky-400/50 bg-gradient-to-b from-sky-400 via-sky-300 to-sky-500'
           }`}>
+            {/* Screen flashes red when answer is wrong */}
+            {flashRed && (
+              <div className="absolute inset-0 bg-red-600/60 animate-pulse pointer-events-none z-50 rounded-3xl flex items-center justify-center">
+                <span className="px-4 py-2 bg-red-950/90 text-red-200 border-2 border-red-400 font-heading font-black text-sm sm:text-base rounded-2xl shadow-2xl">
+                  ⚠️ Cuba Lagi! Jawapan kurang tepat
+                </span>
+              </div>
+            )}
+
             {/* FUNCTIONAL AR CAMERA STREAM */}
             {arMode && (
               <>
@@ -740,10 +757,22 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               </span>
               {frogPosition === 'bank' && (
                 <div
-                  className="animate-float"
+                  draggable={answerState === 'idle'}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', 'frog');
+                    setIsDragging(true);
+                  }}
+                  onDragEnd={() => setIsDragging(false)}
+                  className={`animate-float cursor-grab active:cursor-grabbing transition-transform flex flex-col items-center ${
+                    isDragging ? 'opacity-60 scale-105' : 'hover:scale-105'
+                  }`}
                   style={{ transform: `rotateY(${arRotation}deg)` }}
+                  title="Seret Si Katak ke teratai jawapan!"
                 >
                   <FrogVector pose="happy" size={75} />
+                  <span className="mt-1 px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 font-heading font-black text-[10px] shadow border border-amber-600 animate-pulse">
+                    Seret saya! 🐸
+                  </span>
                   {arMode && (
                     <div className="w-16 h-3 rounded-full bg-cyan-400/80 -mt-1 mx-auto animate-pulse" />
                   )}
@@ -779,7 +808,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               </div>
             </div>
 
-            {/* Floating Lily Pads (Daun Teratai) A, B, C with direct labels and no overlap */}
+            {/* Floating Lily Pads (Daun Teratai) A, B, C with direct labels and no bottom description text */}
             {(() => {
               const optA = curQ.options.find((o) => o.key === 'A');
               const optB = curQ.options.find((o) => o.key === 'B');
@@ -787,21 +816,34 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
               return (
                 <>
-                  {/* Lily Pad B (Center-Top, comfortably below HUD and clear of sides) */}
-                  <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20">
+                  {/* Lily Pad B (Center-Top) - Drag Target & Click */}
+                  <div
+                    className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      handleSelectLeaf('B');
+                    }}
+                  >
                     <button
                       onClick={() => handleSelectLeaf('B')}
                       onPointerEnter={() => { if (arMode) setDetectedHandZone('B'); }}
                       onPointerLeave={() => { if (arMode && !cameraActive) setDetectedHandZone(null); }}
                       disabled={answerState === 'correct'}
-                      aria-label="Pilih Daun Teratai B (Tunjuk dengan tangan di alam nyata)"
+                      aria-label="Pilih Daun Teratai B"
                       className={`group relative min-w-[100px] sm:min-w-[124px] px-3.5 h-14 sm:h-15 rounded-full border-3 shadow-lg flex items-center justify-center gap-2 transform transition-all active:scale-95 ${
                         arMode
                           ? detectedHandZone === 'B'
                             ? 'bg-emerald-500 border-cyan-300 ring-8 ring-cyan-300 scale-110 shadow-[0_0_30px_#22d3ee] backdrop-blur animate-pulse'
                             : 'bg-emerald-600/85 hover:bg-emerald-500 border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.8)] backdrop-blur'
                           : 'bg-emerald-500 hover:bg-emerald-400 border-emerald-700'
-                      } ${selectedLeaf === 'B' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'}`}
+                      } ${selectedLeaf === 'B' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'} ${
+                        isDragging ? 'ring-4 ring-dashed ring-amber-300 animate-pulse' : ''
+                      }`}
                     >
                       <span className="text-white font-heading font-black text-xl drop-shadow">B</span>
                       <span className="text-xs sm:text-sm font-heading font-black text-amber-200 bg-black/50 px-2 py-0.5 rounded-full shadow-xs truncate max-w-[100px]">
@@ -815,13 +857,6 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                         </div>
                       )}
 
-                      {arMode && (
-                        <span className="absolute -bottom-4 text-[9px] font-mono text-cyan-200 bg-black/70 px-1.5 rounded-full flex items-center gap-0.5 whitespace-nowrap">
-                          <span>AR-PAD B</span>
-                          <span className="text-amber-300">🖐️</span>
-                        </span>
-                      )}
-
                       {frogPosition === 'B' && (
                         <div
                           className="absolute -top-12 left-1/2 -translate-x-1/2 animate-bounce"
@@ -833,21 +868,34 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                     </button>
                   </div>
 
-                  {/* Lily Pad A (Bottom-Left, safe from left riverbank) */}
-                  <div className="absolute bottom-4 sm:bottom-6 left-[18%] sm:left-[22%] z-20">
+                  {/* Lily Pad A (Bottom-Left) - Drag Target & Click */}
+                  <div
+                    className="absolute bottom-4 sm:bottom-6 left-[18%] sm:left-[22%] z-20"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      handleSelectLeaf('A');
+                    }}
+                  >
                     <button
                       onClick={() => handleSelectLeaf('A')}
                       onPointerEnter={() => { if (arMode) setDetectedHandZone('A'); }}
                       onPointerLeave={() => { if (arMode && !cameraActive) setDetectedHandZone(null); }}
                       disabled={answerState === 'correct'}
-                      aria-label="Pilih Daun Teratai A (Tunjuk dengan tangan di alam nyata)"
+                      aria-label="Pilih Daun Teratai A"
                       className={`group relative min-w-[100px] sm:min-w-[124px] px-3.5 h-14 sm:h-15 rounded-full border-3 shadow-lg flex items-center justify-center gap-2 transform transition-all active:scale-95 ${
                         arMode
                           ? detectedHandZone === 'A'
                             ? 'bg-emerald-500 border-cyan-300 ring-8 ring-cyan-300 scale-110 shadow-[0_0_30px_#22d3ee] backdrop-blur animate-pulse'
                             : 'bg-emerald-600/85 hover:bg-emerald-500 border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.8)] backdrop-blur'
                           : 'bg-emerald-500 hover:bg-emerald-400 border-emerald-700'
-                      } ${selectedLeaf === 'A' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'}`}
+                      } ${selectedLeaf === 'A' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'} ${
+                        isDragging ? 'ring-4 ring-dashed ring-amber-300 animate-pulse' : ''
+                      }`}
                     >
                       <span className="text-white font-heading font-black text-xl drop-shadow">A</span>
                       <span className="text-xs sm:text-sm font-heading font-black text-amber-200 bg-black/50 px-2 py-0.5 rounded-full shadow-xs truncate max-w-[100px]">
@@ -861,13 +909,6 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                         </div>
                       )}
 
-                      {arMode && (
-                        <span className="absolute -bottom-4 text-[9px] font-mono text-cyan-200 bg-black/70 px-1.5 rounded-full flex items-center gap-0.5 whitespace-nowrap">
-                          <span>AR-PAD A</span>
-                          <span className="text-amber-300">🖐️</span>
-                        </span>
-                      )}
-
                       {frogPosition === 'A' && (
                         <div
                           className="absolute -top-12 left-1/2 -translate-x-1/2 animate-bounce"
@@ -879,21 +920,34 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                     </button>
                   </div>
 
-                  {/* Lily Pad C (Bottom-Right, safe from signboard and Pad A) */}
-                  <div className="absolute bottom-4 sm:bottom-6 right-[18%] sm:right-[22%] z-20">
+                  {/* Lily Pad C (Bottom-Right) - Drag Target & Click */}
+                  <div
+                    className="absolute bottom-4 sm:bottom-6 right-[18%] sm:right-[22%] z-20"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      handleSelectLeaf('C');
+                    }}
+                  >
                     <button
                       onClick={() => handleSelectLeaf('C')}
                       onPointerEnter={() => { if (arMode) setDetectedHandZone('C'); }}
                       onPointerLeave={() => { if (arMode && !cameraActive) setDetectedHandZone(null); }}
                       disabled={answerState === 'correct'}
-                      aria-label="Pilih Daun Teratai C (Tunjuk dengan tangan di alam nyata)"
+                      aria-label="Pilih Daun Teratai C"
                       className={`group relative min-w-[100px] sm:min-w-[124px] px-3.5 h-14 sm:h-15 rounded-full border-3 shadow-lg flex items-center justify-center gap-2 transform transition-all active:scale-95 ${
                         arMode
                           ? detectedHandZone === 'C'
                             ? 'bg-emerald-500 border-cyan-300 ring-8 ring-cyan-300 scale-110 shadow-[0_0_30px_#22d3ee] backdrop-blur animate-pulse'
                             : 'bg-emerald-600/85 hover:bg-emerald-500 border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.8)] backdrop-blur'
                           : 'bg-emerald-500 hover:bg-emerald-400 border-emerald-700'
-                      } ${selectedLeaf === 'C' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'}`}
+                      } ${selectedLeaf === 'C' ? 'ring-4 ring-yellow-300 scale-105' : 'hover:scale-105'} ${
+                        isDragging ? 'ring-4 ring-dashed ring-amber-300 animate-pulse' : ''
+                      }`}
                     >
                       <span className="text-white font-heading font-black text-xl drop-shadow">C</span>
                       <span className="text-xs sm:text-sm font-heading font-black text-amber-200 bg-black/50 px-2 py-0.5 rounded-full shadow-xs truncate max-w-[100px]">
@@ -905,13 +959,6 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                         <div className="absolute -top-11 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-black/90 px-2.5 py-0.5 rounded-full border-2 border-cyan-400 text-cyan-300 text-[10px] font-mono whitespace-nowrap shadow-xl animate-bounce z-40">
                           <span>🖐️ Tangan ({handDwellProgress}%)</span>
                         </div>
-                      )}
-
-                      {arMode && (
-                        <span className="absolute -bottom-4 text-[9px] font-mono text-cyan-200 bg-black/70 px-1.5 rounded-full flex items-center gap-0.5 whitespace-nowrap">
-                          <span>AR-PAD C</span>
-                          <span className="text-amber-300">🖐️</span>
-                        </span>
                       )}
 
                       {frogPosition === 'C' && (

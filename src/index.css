@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @layer base {
-  h1, h2, h3, h4, .font-heading {
-    font-family: 'Fredoka', cursive, sans-serif;
+  body, h1, h2, h3, h4, h5, h6, .font-heading, button, input, select, textarea {
+    font-family: 'Century Gothic', 'CenturyGothic', AppleGothic, 'URW Gothic L', 'Avant Garde', sans-serif;
   }
 }
 

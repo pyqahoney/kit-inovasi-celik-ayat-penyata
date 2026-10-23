@@ -529,10 +529,11 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               <div className="w-18 h-7 bg-emerald-400 border-2 border-emerald-800 rounded-t -mt-1 shadow" />
             </div>
 
-            {/* Floating Brick Blocks & [?] Mystery Question Blocks */}
+            {/* Floating Brick Blocks & [?] Mystery Question Blocks (Bottom-anchored above turf) */}
             {blocks.map((block) => {
               const isBlinking = blinkingBlockId === block.id;
               const isBouncing = bouncingBlockId === block.id;
+              const blockBottom = block.id % 2 === 0 ? 175 : 185;
 
               return (
                 <div
@@ -547,10 +548,10 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                       ? 'scale-115 ring-4 ring-yellow-300 shadow-[0_0_25px_#fde047]'
                       : 'animate-bounce'
                   }`}
-                  style={{ left: `${block.x}px`, top: `${block.y}px` }}
+                  style={{ left: `${block.x}px`, bottom: `${blockBottom}px` }}
                   title={`Blok Soalan ${block.id}: Tekan atau lompat untuk jawab!`}
                 >
-                  {/* Pure visual sparkle glow when hit (tunjuk visual sahaja tanpa teks) */}
+                  {/* Pure visual sparkle glow when hit */}
                   {isBlinking && (
                     <div className="absolute -top-7 left-1/2 -translate-x-1/2 z-40 flex items-center justify-center text-2xl animate-bounce pointer-events-none drop-shadow-[0_0_12px_#fde047]">
                       ✨
@@ -578,7 +579,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                     <span className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-black/30 rounded-full" />
                   </div>
 
-                  {/* Subtitle tag below block (Kekal label soalan tanpa teks 'kelip' atau 'buka soalan') */}
+                  {/* Subtitle tag below block */}
                   <div className="mt-1 text-center">
                     <span className="text-[10px] font-heading font-black px-1.5 py-0.5 rounded-full border shadow whitespace-nowrap bg-black/75 text-amber-300 border-amber-400/60">
                       {block.answered ? `Misi ${block.id} Selesai` : `Soalan ${block.id}`}
@@ -588,13 +589,13 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               );
             })}
 
-            {/* Interactive Gold Floating Coins (separas dengan lompatan Mario) */}
+            {/* Interactive Gold Floating Coins (Bottom-anchored) */}
             {worldCoins.map((coin) => (
               !coin.collected && (
                 <div
                   key={`coin-${coin.id}`}
                   className="absolute z-20 flex flex-col items-center pointer-events-none transition-transform"
-                  style={{ left: `${coin.x}px`, top: `${coin.y}px` }}
+                  style={{ left: `${coin.x}px`, bottom: `${coin.id % 2 === 0 ? 175 : 190}px` }}
                 >
                   <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-300 to-amber-200 border-2 border-yellow-100 shadow-[0_0_12px_#facc15] flex items-center justify-center text-xs font-black animate-pulse">
                     <span className="text-amber-950 font-bold">$</span>
@@ -611,7 +612,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               <div
                 key={`pop-${pop.id}`}
                 className="absolute z-40 text-xs font-heading font-black text-yellow-300 bg-black/85 px-2 py-0.5 rounded-full border border-yellow-400 shadow-xl pointer-events-none animate-bounce"
-                style={{ left: `${pop.x - 10}px`, top: `${pop.y}px` }}
+                style={{ left: `${pop.x - 10}px`, bottom: '210px' }}
               >
                 {pop.text}
               </div>
@@ -640,24 +641,28 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                   Istana Bahasa
                 </span>
                 {/* Castle Door */}
-                <div className="absolute bottom-0 w-10 h-14 bg-black rounded-t-full border-t-2 border-amber-500" />
+                <div className="absolute bottom-0 w-10 h-14 bg-black rounded-t-full border-t-2 border-amber-500 flex items-center justify-center">
+                  {!blocks.every(b => b.answered) && (
+                    <span className="text-base animate-pulse" title="Terkunci">🔒</span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* MARIO CHARACTER SPRITE (Responsif 60fps & Pose Lompatan Ikonik) */}
+            {/* MARIO CHARACTER SPRITE (Berdiri Tegak di Atas Tanah / Ground Bricks - Tidak Terapung!) */}
             <div
               className={`absolute z-30 select-none pointer-events-none ${
                 powerupAnimation ? 'scale-125 ring-4 ring-yellow-300 rounded-full' : ''
               }`}
               style={{
                 left: `${posX}px`,
-                top: `${posY}px`,
+                bottom: `${64 + jumpY}px`,
                 transform: `scaleX(${facing === 'left' ? -1 : 1})`
               }}
             >
               {/* Mario Pixel Vector Character */}
               <div className="relative w-12 h-15 flex flex-col items-center">
-                {/* Punching Arm when Jumping (Tumbukan Tangan Ikonik Super Mario Semasa Melompat!) */}
+                {/* Punching Arm when Jumping */}
                 {isJumping && (
                   <div className="absolute -top-3.5 right-0.5 z-40 flex flex-col items-center animate-pulse">
                     <div className="w-3.5 h-3.5 rounded-full bg-white border border-slate-300 shadow-xs flex items-center justify-center">
@@ -677,17 +682,15 @@ export const MarioGame: React.FC<MarioGameProps> = ({
 
                 {/* Face & Mustache */}
                 <div className={`w-7 h-3.5 bg-[#fcd5b5] relative flex items-center justify-between px-1 border-x border-[#d4a373] ${isJumping ? '-rotate-3' : ''}`}>
-                  <div className="w-1.5 h-2 bg-blue-600 rounded-full" /> {/* Eye */}
-                  <div className="w-4 h-1.5 bg-[#582f0e] rounded-full -mt-0.5" /> {/* Mustache */}
+                  <div className="w-1.5 h-2 bg-blue-600 rounded-full" />
+                  <div className="w-4 h-1.5 bg-[#582f0e] rounded-full -mt-0.5" />
                 </div>
 
                 {/* Overalls & Shirt */}
                 <div className="w-8 h-4 bg-blue-600 rounded-sm relative flex items-center justify-around border-t border-red-600">
                   <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full" />
                   <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full" />
-                  {/* Left sleeve (dihayun ke belakang semasa melompat) */}
                   <div className={`absolute -left-1.5 top-0 w-2 h-3.5 bg-red-600 rounded-full ${isJumping ? 'rotate-45 -translate-y-0.5' : ''}`} />
-                  {/* Right sleeve (jika tidak melompat) */}
                   {!isJumping && (
                     <div className="absolute -right-1.5 top-0 w-2 h-3.5 bg-red-600 rounded-full" />
                   )}
@@ -696,9 +699,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                 {/* Shoes: Classic Jump Mid-air Tuck vs Running Bounce */}
                 {isJumping ? (
                   <div className="w-9 flex justify-between items-center -mt-0.5">
-                    {/* Kaki kiri diangkat ke hadapan */}
                     <div className="w-4 h-3 bg-[#6b4226] rounded-sm transform -rotate-25 shadow-xs border-t border-blue-900" />
-                    {/* Kaki kanan ditekuk ke belakang */}
                     <div className="w-4 h-3 bg-[#6b4226] rounded-sm transform rotate-30 shadow-xs border-t border-blue-900" />
                   </div>
                 ) : (
@@ -708,7 +709,6 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                   </div>
                 )}
 
-                {/* Garisan angin / debu lompatan di bawah kaki */}
                 {isJumping && (
                   <div className="absolute -bottom-2.5 text-[10px] opacity-80 animate-pulse">
                     💨
@@ -717,13 +717,21 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               </div>
             </div>
 
-            {/* Retro Ground Bricks Floor */}
+            {/* Retro Ground Bricks Floor (Height: 64px) */}
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-[#e76f51] border-t-4 border-[#264653] flex flex-col">
               <div className="h-3 bg-emerald-500 border-b border-emerald-700" />
               <div className="flex-1 bg-[repeating-linear-gradient(45deg,#b05d3b,#b05d3b_10px,#944422_10px,#944422_20px)]" />
             </div>
           </div>
         </div>
+
+        {/* Castle Locked Floating Warning */}
+        {showCastleLocked && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-rose-600 text-white font-heading font-black px-4 py-2 rounded-2xl border-2 border-white shadow-2xl flex items-center gap-2 animate-bounce">
+            <span>🔒</span>
+            <span className="text-xs sm:text-sm">Jawab SEMUA 5 blok soalan dengan betul dahulu sebelum masuk ke Istana!</span>
+          </div>
+        )}
 
         {/* Floating Power-up / Encouragement Toast */}
         {powerupAnimation && (
@@ -901,7 +909,9 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                 onClick={() => {
                   setStageFinished(false);
                   setPosX(60);
-                  setPosY(250);
+                  setJumpY(0);
+                  setVelY(0);
+                  setLives(3);
                   setScore(0);
                   setCoins(0);
                   setBlocks(MARIO_QUESTIONS.map(b => ({ ...b, answered: false })));
@@ -914,6 +924,38 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                 className="w-full py-2 text-xs font-bold text-slate-600 hover:text-slate-900 underline"
               >
                 Main Semula Peringkat Ini
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP GAME OVER (Apabila 3 Nyawa Habis) */}
+      {gameOver && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative max-w-sm w-full bg-slate-900 rounded-3xl border-4 border-rose-500 shadow-2xl p-6 text-center text-white">
+            <div className="w-16 h-16 mx-auto -mt-12 bg-rose-600 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center text-3xl animate-bounce">
+              💔
+            </div>
+            <h2 className="text-2xl font-heading font-black text-rose-400 mt-3">
+              Nyawa Telah Habis!
+            </h2>
+            <p className="text-xs text-slate-300 mt-1">
+              Jangan berputus asa! Ingat kembali formula kata perintah (suruhan, larangan, silaan, permintaan) dan cuba lagi.
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                onClick={handleRetryAfterGameOver}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-heading font-black text-sm shadow-[0_4px_0_#b45309] active:translate-y-1 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Cuba Sekali Lagi (3 Nyawa)</span>
+                <span>🔄</span>
+              </button>
+              <button
+                onClick={onBack}
+                className="w-full py-2 text-xs font-bold text-slate-400 hover:text-white"
+              >
+                Kembali ke Menu
               </button>
             </div>
           </div>

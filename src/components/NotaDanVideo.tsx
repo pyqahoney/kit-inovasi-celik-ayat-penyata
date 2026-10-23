@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
 import { CikguVector, CatVector } from './IllustratedCharacters';
 import { MotherAndDaughterVector, PolarBearAndBoardCat, EmotiveShapeMascot, BlueBirdVector } from './StoryGraphics';
-import { Play, Pause, RotateCcw, Sparkles, Volume2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, Sparkles, Volume2, BookOpen } from 'lucide-react';
 import { sound } from '../utils/audio';
-import { TeaterDramaVideo } from './TeaterDramaVideo';
 
 interface NotaDanVideoProps {
   initialSubTab?: 'nota' | 'video';
@@ -19,42 +18,17 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
   soundEnabled,
   onToggleSound
 }) => {
-  // Page index within notes (0 to 6):
+  // Page index within notes (0 to 5):
   // 0: Definisi Ayat Perintah (Page 8)
   // 1: Contoh Situasi Ibu & Anak (Pages 9-11)
   // 2: Peta Minda 4 Jenis Kata Perintah (Page 12)
   // 3: Roda 7 Kata Perintah (Page 13)
   // 4: Definisi 4 Jenis Ayat Perintah (Page 14)
-  // 5: Video Interaktif Cikgu Syuhada (Page 15)
-  // 6: Pentas Teater Boneka "Ayat Perintah" (Page 16)
+  // 5: Video Pembelajaran Interaktif (Page 15)
   const [pageIndex, setPageIndex] = useState(initialSubTab === 'video' ? 5 : 0);
-  const [videoPlaying, setVideoPlaying] = useState(false);
-  const [videoTime, setVideoTime] = useState(15);
-  const [theaterScene, setTheaterScene] = useState(0);
-
-  const theaterDialogs = [
-    {
-      watak: 'Sang Kancil',
-      dialog: '“Sila masuk ke rumah saya, wahai Sang Belang. Janganlah kamu berasa segan!”',
-      jenis: 'Ayat Silaan & Larangan',
-      warna: 'bg-amber-100 text-amber-900 border-amber-300'
-    },
-    {
-      watak: 'Sang Belang',
-      dialog: '“Terima kasih Kancil. Tolong hulurkan segelas air sejuk itu kerana cuaca amat panas hari ini.”',
-      jenis: 'Ayat Permintaan',
-      warna: 'bg-sky-100 text-sky-900 border-sky-300'
-    },
-    {
-      watak: 'Cikgu Aina',
-      dialog: '“Bagus sekali! Kemaslah semula pinggan mangkuk selepas kita menikmati jamuan ini bersama!”',
-      jenis: 'Ayat Suruhan',
-      warna: 'bg-emerald-100 text-emerald-900 border-emerald-300'
-    }
-  ];
 
   const handleNextPage = () => {
-    if (pageIndex < 6) {
+    if (pageIndex < 5) {
       setPageIndex((prev) => prev + 1);
     } else {
       onBack();
@@ -80,9 +54,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         title={
           pageIndex <= 4
             ? `Nota Interaktif (${pageIndex + 1}/5)`
-            : pageIndex === 5
-            ? 'Video: Cikgu Syafiqah, Freshcy & Aaron'
-            : 'Pentas Teater Cerita'
+            : 'Video Pembelajaran: Cikgu Syafiqah, Freshcy & Aaron'
         }
       />
 
@@ -94,8 +66,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
           { label: 'Peta Minda', idx: 2 },
           { label: '7 Kata Perintah', idx: 3 },
           { label: '4 Jenis Ayat', idx: 4 },
-          { label: '📹 Video 3 Cikgu', idx: 5 },
-          { label: '🎭 Teater', idx: 6 }
+          { label: '📹 Video Pembelajaran', idx: 5 }
         ].map((tab) => (
           <button
             key={tab.idx}
@@ -419,19 +390,19 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {/* 1. Cikgu Syafiqah (Bertudung & Baju Kurung) */}
+                  {/* 1. Cikgu Syafiqah */}
                   <div className="p-2.5 rounded-xl bg-slate-700/80 border border-purple-400/50 flex flex-col justify-between">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 shadow-md shrink-0 bg-purple-100">
                         <img
-                          src="/assets/aistudio/cikgu_syafiqah_avatar.png"
+                          src="/assets/aistudio/cikgu_syafiqah_avatar_clean.png"
                           alt="Cikgu Syafiqah"
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-purple-300">Cikgu Syafiqah</h4>
-                        <span className="text-[9px] text-purple-200 block font-semibold">Baju Kurung · Bertudung</span>
+                        <span className="text-[9px] text-purple-200 block font-semibold">Guru Bahasa Melayu</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -452,19 +423,19 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                     </button>
                   </div>
 
-                  {/* 2. Cikgu Freshcy (Tidak Bertudung & Baju Kurung) */}
+                  {/* 2. Cikgu Freshcy */}
                   <div className="p-2.5 rounded-xl bg-slate-700/80 border border-amber-400/50 flex flex-col justify-between">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400 shadow-md shrink-0 bg-amber-100">
                         <img
-                          src="/assets/aistudio/cikgu_freshcy_avatar.png"
+                          src="/assets/aistudio/cikgu_freshcy_avatar_clean.png"
                           alt="Cikgu Freshcy"
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-amber-300">Cikgu Freshcy</h4>
-                        <span className="text-[9px] text-amber-200 block font-semibold">Baju Kurung · Ceria</span>
+                        <span className="text-[9px] text-amber-200 block font-semibold">Inovator Digital PdP</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -485,19 +456,19 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                     </button>
                   </div>
 
-                  {/* 3. Cikgu Aaron (Lelaki & Baju Kemeja) */}
+                  {/* 3. Cikgu Aaron */}
                   <div className="p-2.5 rounded-xl bg-slate-700/80 border border-sky-400/50 flex flex-col justify-between">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-sky-400 shadow-md shrink-0 bg-sky-100">
                         <img
-                          src="/assets/aistudio/cikgu_aaron_avatar.png"
+                          src="/assets/aistudio/cikgu_aaron_avatar_clean.png"
                           alt="Cikgu Aaron"
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-sky-300">Cikgu Aaron</h4>
-                        <span className="text-[9px] text-sky-200 block font-semibold">Baju Kemeja · Segak</span>
+                        <span className="text-[9px] text-sky-200 block font-semibold">Pakar Tatabahasa PdP</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -524,11 +495,6 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         </div>
       )}
 
-      {/* PAGE 6: Pementasan Drama Teater SK Seri Kundang: Jangan Toleh Belakang (Learning Port Interactive) */}
-      {pageIndex === 6 && (
-        <TeaterDramaVideo />
-      )}
-
       {/* Bottom Navigation */}
       <div className="flex items-center justify-between w-full pt-2">
         <WoodArrowButton
@@ -538,7 +504,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         />
 
         <div className="text-xs font-bold text-amber-900 bg-amber-200/70 px-4 py-1.5 rounded-full">
-          Halaman {pageIndex + 1} daripada 7
+          Halaman {pageIndex + 1} daripada 6
         </div>
 
         <WoodArrowButton
