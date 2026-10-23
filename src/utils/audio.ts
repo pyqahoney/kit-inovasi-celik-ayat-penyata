@@ -16,8 +16,8 @@ class SoundController {
   private volumeRampTimer: number | null = null;
 
   // Normal and ducked volumes for Nintendo Cafe BGM
-  private readonly NORMAL_BGM_VOLUME = 0.30;
-  private readonly DUCKED_BGM_VOLUME = 0.06;
+  private readonly NORMAL_BGM_VOLUME = 0.35;
+  private readonly DUCKED_BGM_VOLUME = 0.08;
 
   private getAudioContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -43,12 +43,19 @@ class SoundController {
       this.bgmAudio.loop = true;
       this.bgmAudio.preload = 'auto';
       this.bgmAudio.volume = this.NORMAL_BGM_VOLUME;
+      // Loop backup to ensure continuous playback across all browsers
+      this.bgmAudio.addEventListener('ended', () => {
+        if (this.enabled && this.isBGMPlaying && this.currentModule === 'default' && this.bgmAudio) {
+          this.bgmAudio.currentTime = 0;
+          this.bgmAudio.play().catch(() => {});
+        }
+      });
     }
     return this.bgmAudio;
   }
 
-  // Current active BGM module: 'default' | 'frog' | 'mario' | 'treasure'
-  public currentModule: 'default' | 'frog' | 'mario' | 'treasure' = 'default';
+  // Current active BGM module: 'default' | 'frog' | 'mario' | 'treasure' | 'pacman'
+  public currentModule: 'default' | 'frog' | 'mario' | 'treasure' | 'pacman' = 'default';
   private synthLoopTimer: number | null = null;
   private synthStep: number = 0;
 
@@ -58,13 +65,25 @@ class SoundController {
   }
 
   // Set and play module-specific BGM
-  playModuleBGM(module: 'default' | 'frog' | 'mario' | 'treasure') {
-    this.currentModule = module;
+  playModuleBGM(module: 'default' | 'frog' | 'mario' | 'treasure' | 'pacman') {
     if (!this.enabled) return;
+
+    // If default Nintendo Cafe BGM is already actively playing, keep it continuous
+    if (
+      module === 'default' &&
+      this.currentModule === 'default' &&
+      this.isBGMPlaying &&
+      this.bgmAudio &&
+      !this.bgmAudio.paused
+    ) {
+      return;
+    }
+
+    this.currentModule = module;
 
     // Stop existing audio element and synth loop
     this.stopSynthBGM();
-    if (this.bgmAudio) {
+    if (this.bgmAudio && module !== 'default') {
       this.bgmAudio.pause();
     }
 
@@ -82,6 +101,8 @@ class SoundController {
       this.startFrogBGM();
     } else if (module === 'treasure') {
       this.startTreasureBGM();
+    } else if (module === 'pacman') {
+      this.startPacmanBGM();
     }
   }
 
@@ -254,6 +275,50 @@ class SoundController {
         this.playCustomTone(cur.f, 'sawtooth', cur.d, vol * 0.85);
         if (cur.b) {
           this.playCustomTone(cur.b, 'triangle', cur.d + 0.05, vol);
+        }
+      }
+    }, tickTime);
+  }
+
+  // 4. Retro Arcade Pac-Man Chiptune Theme Synthesizer
+  private startPacmanBGM() {
+    this.stopSynthBGM();
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    // Iconic Pac-Man Theme intro & waka rhythm
+    const pacmanNotes: Array<{ f: number; d: number; b?: number }> = [
+      { f: 493.88, d: 0.12, b: 123.47 }, // B4
+      { f: 987.77, d: 0.12, b: 123.47 }, // B5
+      { f: 739.99, d: 0.12, b: 92.50 },  // F#5
+      { f: 622.25, d: 0.12, b: 92.50 },  // D#5
+      { f: 987.77, d: 0.12, b: 123.47 }, // B5
+      { f: 739.99, d: 0.14, b: 92.50 },  // F#5
+      { f: 622.25, d: 0.18, b: 92.50 },  // D#5
+      { f: 0, d: 0.10 },
+      { f: 523.25, d: 0.12, b: 130.81 }, // C5
+      { f: 1046.50, d: 0.12, b: 130.81 },// C6
+      { f: 783.99, d: 0.12, b: 98.00 },  // G5
+      { f: 659.25, d: 0.12, b: 98.00 },  // E5
+      { f: 1046.50, d: 0.12, b: 130.81 },// C6
+      { f: 783.99, d: 0.14, b: 98.00 },  // G5
+      { f: 659.25, d: 0.18, b: 98.00 },  // E5
+      { f: 0, d: 0.12 }
+    ];
+
+    let noteIdx = 0;
+    const tickTime = 150;
+
+    this.synthLoopTimer = window.setInterval(() => {
+      if (!this.enabled || !this.isBGMPlaying || this.currentModule !== 'pacman') return;
+      const cur = pacmanNotes[noteIdx];
+      noteIdx = (noteIdx + 1) % pacmanNotes.length;
+
+      if (cur.f > 0) {
+        const vol = this.isSpeaking ? 0.02 : 0.07;
+        this.playCustomTone(cur.f, 'triangle', cur.d, vol);
+        if (cur.b) {
+          this.playCustomTone(cur.b, 'square', cur.d + 0.03, vol * 0.7);
         }
       }
     }, tickTime);
@@ -493,6 +558,16 @@ class SoundController {
     this.lastClickTimestamp = now;
 
     this.playTone(620, 'sine', 0.08, 0);
+
+    // If default BGM is active and unpaused, make sure it plays upon user gesture
+    if (this.currentModule === 'default') {
+      const bgm = this.getBGMAudio();
+      if (bgm && bgm.paused) {
+        bgm.volume = this.isSpeaking ? this.DUCKED_BGM_VOLUME : this.NORMAL_BGM_VOLUME;
+        bgm.play().catch(() => {});
+        this.isBGMPlaying = true;
+      }
+    }
   }
 
   // Jump spring sound for platformer

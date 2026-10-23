@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
+import { TopNavBar, WoodArrowButton } from './OrganicNav';
 import { FrogVector } from './IllustratedCharacters';
 import { BlueBirdVector, CuteSunVector, FoliageForeground, ButterflyVector } from './StoryGraphics';
 import { Camera, CameraOff, Sparkles, RefreshCw, FlipHorizontal, Eye, Maximize2 } from 'lucide-react';
@@ -382,7 +382,14 @@ export const FrogGame: React.FC<FrogGameProps> = ({
   }, [arMode, cameraActive, answerState, subStage, currentIdx]);
 
   return (
-    <div className="relative min-h-[580px] md:min-h-[640px] lg:min-h-[700px] w-full mx-auto rounded-3xl overflow-hidden border-4 border-emerald-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-3 sm:p-6">
+    <div
+      className="relative min-h-[580px] md:min-h-[640px] lg:min-h-[700px] w-full mx-auto rounded-3xl overflow-hidden border-4 border-emerald-300 shadow-2xl flex flex-col justify-between p-3 sm:p-6"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25)), url('/assets/aistudio/halaman_game_katak_ccde46f4.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
       {/* Top Navbar */}
       <TopNavBar
         onExit={() => {
@@ -522,9 +529,6 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               <p className="text-sm text-slate-600 text-center mt-2">
                 Pilih jawapan yang paling tepat supaya Si Katak dapat menyeberang dengan selamat.
               </p>
-              <div className="mt-4 flex justify-center gap-2">
-                <AudioSpeakerButton textToSpeak="Jom selamatkan si katak! Tekan butang seterusnya untuk bermula." size="md" label="Dengar Arahan" />
-              </div>
             </div>
 
             <div className="shrink-0 transform hover:scale-105 transition-transform">
@@ -553,7 +557,6 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                   {curQ.sentenceEnd && <span> {curQ.sentenceEnd}</span>}
                 </p>
               </div>
-              <AudioSpeakerButton textToSpeak={curQ.fullSentence} size="md" />
             </div>
 
             {/* Feedback message banner if answered */}

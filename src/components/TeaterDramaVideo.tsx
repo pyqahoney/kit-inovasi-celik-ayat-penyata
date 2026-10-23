@@ -115,8 +115,8 @@ export const TeaterDramaVideo: React.FC<{
   const [isPlayingAuto, setIsPlayingAuto] = useState(false);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
   const [isAudienceClapping, setIsAudienceClapping] = useState(false);
-  const [localVideoUrl, setLocalVideoUrl] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'teater' | 'pemain_video'>('teater');
+  const [localVideoUrl, setLocalVideoUrl] = useState<string | null>('/assets/aistudio/cerita_ayat_perintah_94f88fc3.mp4');
+  const [activeTab, setActiveTab] = useState<'pemain_video' | 'teater'>('pemain_video');
   const timerRef = useRef<number | null>(null);
 
   const curScene = DRAMA_SCENES[currentSceneIdx];

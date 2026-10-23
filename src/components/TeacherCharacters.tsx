@@ -226,7 +226,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
         {/* Shadow Pedestal */}
         <div className="w-24 h-3 bg-black/20 rounded-full blur-xs -mt-1 pointer-events-none" />
 
-        {/* Name Plate & Role Label */}
+        {/* Name Plate */}
         <div className="mt-1 flex flex-col items-center text-center">
           <span
             className={`px-2.5 py-0.5 rounded-full text-xs font-heading font-black border ${profile.temaWarna.badge} shadow-xs flex items-center gap-1.5`}
@@ -235,9 +235,6 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
               <img src={profile.avatarUrl} alt={profile.nama} className="w-full h-full object-cover" />
             </span>
             <span>{profile.nama}</span>
-          </span>
-          <span className="text-[10px] text-slate-600 font-semibold mt-0.5 max-w-[170px] leading-tight">
-            {profile.gelaran}
           </span>
         </div>
       </div>

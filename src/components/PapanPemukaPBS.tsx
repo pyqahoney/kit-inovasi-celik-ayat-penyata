@@ -294,17 +294,22 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
         })}
       </div>
 
-      {/* Search and Filters Bar */}
+      {/* Search and Filters Bar with Class 5 Bestari Badge */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 my-2">
-        <div className="relative w-full sm:w-72">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Cari murid mengikut nama atau kelas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
-          />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <span className="px-3 py-1 bg-amber-200/80 border border-amber-400 text-amber-950 font-heading font-black text-xs rounded-xl shadow-xs shrink-0">
+            Kelas: 5 Bestari 🏫
+          </span>
+          <div className="relative w-full sm:w-64">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari murid mengikut nama atau kelas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto text-xs">

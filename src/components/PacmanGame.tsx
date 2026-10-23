@@ -4,10 +4,12 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowDown,
-  Flame
+  Flame,
+  Gamepad2,
+  BookOpen
 } from 'lucide-react';
 import { sound } from '../utils/audio';
-import { TopNavBar, AudioSpeakerButton } from './OrganicNav';
+import { TopNavBar, WoodArrowButton } from './OrganicNav';
 
 interface PacmanGameProps {
   onBack: () => void;
@@ -122,6 +124,9 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
   onToggleSound,
   onComplete
 }) => {
+  // Navigation stage: intro -> rules -> guide -> playing
+  const [subStage, setSubStage] = useState<'intro' | 'rules' | 'guide' | 'playing'>('intro');
+
   // Game states
   const [grid, setGrid] = useState<number[][]>(() => MAZE_GRID.map((row) => [...row]));
   const [pacman, setPacman] = useState<{ x: number; y: number; dir: 'up' | 'down' | 'left' | 'right' }>({
@@ -437,11 +442,165 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         onHelp={() => sound.speakMalay("Gunakan anak panah untuk menggerakkan Pac-Man memakan bintik dan bintang kuasa ayat perintah!")}
-        title="Wira Pac-Man: Labirin Ayat Perintah"
+        title="Game Kuasa Pac-Man: Labirin Ayat Perintah"
       />
 
-      {/* Retro Arcade Pac-Man Canvas Frame (Widescreen Landscape on Desktop, Portrait on Phone) */}
-      <div className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl bg-black flex flex-col justify-between select-none">
+      {/* Screen 1: Pengenalan Game Kuasa Pac-Man */}
+      {subStage === 'intro' && (
+        <div
+          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.8)), url('/assets/aistudio/halaman_game_pacman_9df0c15e.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="flex-1 flex flex-col items-center justify-center text-center max-w-xl mx-auto z-10">
+            <div className="w-20 h-20 rounded-3xl bg-yellow-400 border-4 border-white shadow-2xl flex items-center justify-center text-4xl mb-4 animate-bounce">
+              🟡
+            </div>
+
+            <div className="bg-slate-900/95 backdrop-blur-md p-6 rounded-3xl border-4 border-yellow-400 shadow-2xl text-white">
+              <h1 className="text-3xl sm:text-4xl font-heading font-black text-yellow-400 drop-shadow-sm uppercase tracking-wide">
+                Game Kuasa Pac-Man
+              </h1>
+              <span className="inline-block mt-1 px-3 py-1 bg-yellow-400 text-slate-950 rounded-full text-xs font-heading font-black">
+                Misi Labirin: Ayat Perintah
+              </span>
+              <p className="text-slate-200 text-sm sm:text-base font-semibold mt-3 leading-relaxed">
+                Kembara Labirin Ayat Perintah bersama Pac-Man! Makan bintik kuasa untuk membuka cabaran tatabahasa, tewaskan hantu nakal, dan kuasai 4 jenis ayat perintah!
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => {
+                  sound.playSuccess();
+                  setSubStage('rules');
+                }}
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-heading font-black text-base shadow-[0_5px_0_#b45309] active:translate-y-1 transition-all flex items-center gap-2"
+              >
+                <Gamepad2 size={20} />
+                <span>Mula Misi 🟡</span>
+              </button>
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setSubStage('rules');
+                }}
+                className="px-5 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-yellow-400 font-heading font-black text-sm border-2 border-yellow-400 shadow-[0_5px_0_#0f172a] active:translate-y-1 transition-all flex items-center gap-2"
+              >
+                <BookOpen size={18} />
+                <span>Cara Bermain</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screen 2: Cara Bermain Game Kuasa Pac-Man */}
+      {subStage === 'rules' && (
+        <div
+          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('/assets/aistudio/halaman_game_pacman_9df0c15e.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="flex-1 flex flex-col items-center justify-center my-2 z-10">
+            <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-slate-900/95 border-4 border-yellow-400 shadow-[0_8px_0_#713f12] text-white">
+              <h2 className="text-2xl sm:text-3xl font-heading font-black text-yellow-400 text-center mb-4">
+                Cara Bermain
+              </h2>
+
+              <div className="space-y-3 text-sm sm:text-base font-bold text-slate-200">
+                <div className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">1</span>
+                  <p>Gunakan butang anak panah di skrin atau papan kekunci untuk menggerakkan Pac-Man di dalam labirin.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">2</span>
+                  <p>Kutip semua bintik kuning kecil untuk mengumpul markah dan syiling emas.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">3</span>
+                  <p>Makan <strong>Bintang Kuasa (⭐)</strong> di penjuru untuk membuka cabaran soalan ayat perintah!</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">4</span>
+                  <p>Jawapan yang betul menukarkan hantu menjadi <strong>Hantu Biru</strong> yang boleh dimakan untuk mata bonus gergasi!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screen 3: Panduan untuk Murid */}
+      {subStage === 'guide' && (
+        <div
+          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('/assets/aistudio/halaman_game_pacman_9df0c15e.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="flex-1 flex flex-col items-center justify-center my-2 z-10">
+            <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-slate-900/95 border-4 border-yellow-400 shadow-[0_8px_0_#713f12] text-white">
+              <h2 className="text-2xl sm:text-3xl font-heading font-black text-yellow-400 text-center mb-5">
+                Panduan untuk Murid
+              </h2>
+
+              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm font-bold text-slate-200">
+                <div className="flex flex-col items-center p-3 bg-slate-800/90 rounded-2xl border-2 border-yellow-500/60 text-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center font-black text-xl text-slate-950 mb-1">
+                    •
+                  </div>
+                  <span className="font-heading font-black text-yellow-300">Bintik Kuning</span>
+                  <span className="text-[11px] text-slate-300 mt-0.5">Kumpul untuk markah & syiling</span>
+                </div>
+
+                <div className="flex flex-col items-center p-3 bg-slate-800/90 rounded-2xl border-2 border-yellow-500/60 text-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-400 to-rose-400 border-2 border-white flex items-center justify-center font-black text-xl text-slate-950 mb-1">
+                    ⭐
+                  </div>
+                  <span className="font-heading font-black text-yellow-300">Bintang Kuasa</span>
+                  <span className="text-[11px] text-slate-300 mt-0.5">Membuka soalan Ayat Perintah</span>
+                </div>
+
+                <div className="flex flex-col items-center p-3 bg-slate-800/90 rounded-2xl border-2 border-yellow-500/60 text-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-cyan-600 border-2 border-cyan-300 flex items-center justify-center font-black text-xl text-white mb-1">
+                    👻
+                  </div>
+                  <span className="font-heading font-black text-cyan-300">Hantu Biru</span>
+                  <span className="text-[11px] text-slate-300 mt-0.5">Makan hantu untuk +200 mata!</span>
+                </div>
+
+                <div className="flex flex-col items-center p-3 bg-slate-800/90 rounded-2xl border-2 border-yellow-500/60 text-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-rose-600 border-2 border-rose-300 flex items-center justify-center font-black text-xl text-white mb-1">
+                    🍒
+                  </div>
+                  <span className="font-heading font-black text-rose-300">Buah Ceri</span>
+                  <span className="text-[11px] text-slate-300 mt-0.5">Bonus gergasi +150 mata</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screen 4: Retro Arcade Pac-Man Canvas Frame */}
+      {subStage === 'playing' && (
+      <div
+        className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between select-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('/assets/aistudio/halaman_game_pacman_9df0c15e.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         {/* Arcade HUD Header */}
         <div className="relative z-30 bg-slate-950/95 px-3 sm:px-4 py-2 flex items-center justify-between text-yellow-400 font-mono text-xs sm:text-sm border-b-2 border-yellow-500/50">
           <div className="flex items-center gap-1.5 font-black">
@@ -664,6 +823,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* POPUP MODAL: Cabaran Bintang Kuasa Ayat Perintah */}
       {activeChallenge && (
@@ -684,17 +844,17 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
               </span>
             </div>
 
-            {/* Question Text */}
-            <div className="p-4 rounded-2xl bg-slate-800/80 border-2 border-yellow-500/50 mb-4 text-center">
-              <p className="text-sm sm:text-base font-heading font-black text-white leading-snug">
-                {activeChallenge.soalan}
+            {/* Question Prompt Box (Jawapan disembunyikan daripada kotak soalan) */}
+            <div className="p-4 rounded-2xl bg-slate-800/90 border-2 border-yellow-500/60 mb-4 text-center shadow-inner">
+              <span className="text-[11px] font-bold text-yellow-400 uppercase tracking-widest block mb-1">
+                Cabaran Tatabahasa {activeChallenge.jenis}
+              </span>
+              <p className="text-base sm:text-lg font-heading font-black text-white leading-snug">
+                {activeChallenge.soalan} yang betul:
               </p>
-              <p className="text-xs text-yellow-300 font-bold mt-1 italic">
-                "{activeChallenge.ayatPenuh}"
+              <p className="text-xs text-slate-300 mt-1">
+                Pilih satu pilihan jawapan yang tepat di bawah untuk mengaktifkan kuasa Pac-Man!
               </p>
-              <div className="mt-2 flex justify-center">
-                <AudioSpeakerButton textToSpeak={activeChallenge.ayatPenuh} size="sm" />
-              </div>
             </div>
 
             {/* Multiple Choice Options */}
@@ -791,6 +951,41 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
           </div>
         </div>
       )}
+
+      {/* Bottom Navigation Buttons */}
+      <div className="flex items-center justify-between w-full pt-2 z-10">
+        <WoodArrowButton
+          direction="prev"
+          onClick={() => {
+            if (subStage === 'rules') setSubStage('intro');
+            else if (subStage === 'guide') setSubStage('rules');
+            else if (subStage === 'playing') setSubStage('guide');
+          }}
+          disabled={subStage === 'intro'}
+        />
+
+        <div className="text-xs font-bold text-yellow-400 bg-slate-900/95 border border-yellow-500/50 px-4 py-1.5 rounded-full shadow-sm">
+          {subStage === 'intro' && 'Pengenalan (Kuasa Pac-Man)'}
+          {subStage === 'rules' && 'Cara Bermain'}
+          {subStage === 'guide' && 'Panduan Murid'}
+          {subStage === 'playing' && `Labirin (Markah: ${score})`}
+        </div>
+
+        <WoodArrowButton
+          direction="next"
+          onClick={() => {
+            if (subStage === 'intro') setSubStage('rules');
+            else if (subStage === 'rules') setSubStage('guide');
+            else if (subStage === 'guide') setSubStage('playing');
+            else if (subStage === 'playing') {
+              if (answeredCount >= 4) {
+                setStageFinished(true);
+              }
+            }
+          }}
+          label={subStage === 'guide' ? 'Mula Main' : undefined}
+        />
+      </div>
     </div>
   );
 };

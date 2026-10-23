@@ -4,9 +4,10 @@ import { CikguVector, CatVector } from './IllustratedCharacters';
 import { MotherAndDaughterVector, PolarBearAndBoardCat, EmotiveShapeMascot, BlueBirdVector } from './StoryGraphics';
 import { Play, Pause, RotateCcw, Sparkles, Volume2, BookOpen } from 'lucide-react';
 import { sound } from '../utils/audio';
+import { TeaterDramaVideo } from './TeaterDramaVideo';
 
 interface NotaDanVideoProps {
-  initialSubTab?: 'nota' | 'video';
+  initialSubTab?: 'nota' | 'video' | 'teater';
   onBack: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -18,17 +19,20 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
   soundEnabled,
   onToggleSound
 }) => {
-  // Page index within notes (0 to 5):
+  // Page index within notes (0 to 6):
   // 0: Definisi Ayat Perintah (Page 8)
   // 1: Contoh Situasi Ibu & Anak (Pages 9-11)
-  // 2: Peta Minda 4 Jenis Kata Perintah (Page 12)
-  // 3: Roda 7 Kata Perintah (Page 13)
-  // 4: Definisi 4 Jenis Ayat Perintah (Page 14)
-  // 5: Video Pembelajaran Interaktif (Page 15)
-  const [pageIndex, setPageIndex] = useState(initialSubTab === 'video' ? 5 : 0);
+  // 2: Definisi 4 Jenis Ayat Perintah (Page 14 - Dahulu!)
+  // 3: Peta Minda 4 Jenis Kata Perintah (Page 12)
+  // 4: 7 Kata Perintah Disusun Ikut Jenis (Page 13)
+  // 5: Video Pembelajaran Guru (Page 15)
+  // 6: Pentas Teater Drama SK Seri Kundang (Video MP4)
+  const [pageIndex, setPageIndex] = useState(
+    initialSubTab === 'video' ? 5 : initialSubTab === 'teater' ? 6 : 0
+  );
 
   const handleNextPage = () => {
-    if (pageIndex < 5) {
+    if (pageIndex < 6) {
       setPageIndex((prev) => prev + 1);
     } else {
       onBack();
@@ -54,19 +58,22 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         title={
           pageIndex <= 4
             ? `Nota Interaktif (${pageIndex + 1}/5)`
-            : 'Video Pembelajaran: Cikgu Syafiqah, Freshcy & Aaron'
+            : pageIndex === 5
+            ? 'Video Pembelajaran: Cikgu Syafiqah, Freshcy & Aaron'
+            : 'Pentas Teater Drama: Jangan Toleh Belakang'
         }
       />
 
       {/* Quick Jump Bar for Teacher & Student */}
       <div className="flex items-center justify-center gap-1.5 overflow-x-auto py-1 px-2 my-1">
         {[
-          { label: 'Definisi', idx: 0 },
-          { label: 'Situasi', idx: 1 },
-          { label: 'Peta Minda', idx: 2 },
-          { label: '7 Kata Perintah', idx: 3 },
-          { label: '4 Jenis Ayat', idx: 4 },
-          { label: '📹 Video Pembelajaran', idx: 5 }
+          { label: '1. Definisi', idx: 0 },
+          { label: '2. Situasi', idx: 1 },
+          { label: '3. Jenis Ayat Perintah', idx: 2 },
+          { label: '4. Jenis Kata Perintah', idx: 3 },
+          { label: '5. 7 Kata Perintah', idx: 4 },
+          { label: '6. 📹 Video Guru', idx: 5 },
+          { label: '7. 🎭 Pentas Teater', idx: 6 }
         ].map((tab) => (
           <button
             key={tab.idx}
@@ -116,9 +123,16 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               </div>
             </div>
 
-            {/* Mother and Daughter vector illustration matching Page 8 */}
-            <div className="shrink-0 flex items-center justify-center p-2 bg-white/70 rounded-3xl border-2 border-amber-200 shadow-sm">
-              <MotherAndDaughterVector size={230} />
+            {/* Mother and Daughter real uploaded illustration */}
+            <div className="shrink-0 flex flex-col items-center justify-center p-2.5 bg-white/95 rounded-3xl border-3 border-amber-300 shadow-xl max-w-xs overflow-hidden transform hover:scale-102 transition-transform">
+              <img
+                src="/assets/aistudio/c11bd8d4-1a10-485b-b4de-becf3a2774f8_d864cc31.jpg"
+                alt="Ibu memberi arahan kepada anak"
+                className="w-full h-auto rounded-2xl object-cover shadow-sm max-h-56"
+              />
+              <span className="text-[11px] font-heading font-black text-amber-900 mt-2 bg-amber-100 px-3 py-0.5 rounded-full border border-amber-300">
+                Situasi: Ibu Memberi Arahan Kepada Anak 👩‍👧
+              </span>
             </div>
           </div>
         </div>
@@ -132,42 +146,148 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               Contoh Ayat & Struktur Perintah
             </span>
             <h2 className="text-2xl sm:text-4xl font-heading font-black text-slate-900 mt-1">
-              kamu tolong ibu kemaskan rumah
+              “Kamu tolong ibu kemaskan rumah.”
             </h2>
           </div>
 
-          {/* Polar Bear & Cat holding whiteboard matching storyboard Pages 10 & 11 */}
-          <div className="flex justify-center my-2">
-            <PolarBearAndBoardCat signText="tolong merupakan kata perintah" size={320} />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto w-full my-1">
-            <div className="p-3 rounded-2xl bg-amber-100/90 border-2 border-amber-400 text-center flex items-center gap-3 shadow-sm">
-              <span className="text-2xl">💡</span>
-              <div className="text-left">
-                <h4 className="font-heading font-bold text-xs text-amber-950 uppercase">orang yang memberikan arahan</h4>
-                <p className="text-[11px] text-amber-900">Ibu yang menuturkan perintah kepada anak.</p>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-5 max-w-4xl mx-auto w-full my-2">
+            {/* Real Uploaded Mother & Child Image on Page 2 */}
+            <div className="w-full md:w-5/12 flex flex-col items-center">
+              <div className="p-2.5 bg-white/95 rounded-3xl border-3 border-amber-400 shadow-xl overflow-hidden max-w-sm">
+                <img
+                  src="/assets/aistudio/c11bd8d4-1a10-485b-b4de-becf3a2774f8_d864cc31.jpg"
+                  alt="Ibu memberi arahan kepada anak"
+                  className="w-full h-auto rounded-2xl object-cover max-h-52"
+                />
+                <div className="p-2 text-center">
+                  <p className="text-xs font-heading font-black text-amber-950">
+                    “Kamu tolong ibu kemaskan rumah ya, sayang.”
+                  </p>
+                  <p className="text-[10px] text-amber-800 font-medium mt-0.5">
+                    Ibu menggunakan kata perintah santun "tolong" dengan intonasi mesra.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl bg-sky-100/90 border-2 border-sky-400 text-center flex items-center gap-3 shadow-sm">
-              <span className="text-2xl">💡</span>
-              <div className="text-left">
-                <h4 className="font-heading font-bold text-xs text-sky-950 uppercase">orang kedua</h4>
-                <p className="text-[11px] text-sky-900">Kata ganti nama "kamu" yang menerima suruhan.</p>
+            {/* Explanation Breakdown & Whiteboard */}
+            <div className="w-full md:w-7/12 space-y-3">
+              <div className="flex justify-center">
+                <PolarBearAndBoardCat signText="tolong merupakan kata perintah" size={260} />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+                <div className="p-3 rounded-2xl bg-amber-100/90 border-2 border-amber-400 text-center flex items-center gap-3 shadow-sm">
+                  <span className="text-2xl">👩</span>
+                  <div className="text-left">
+                    <h4 className="font-heading font-bold text-xs text-amber-950 uppercase">orang yang memberikan arahan</h4>
+                    <p className="text-[11px] text-amber-900">Ibu yang menuturkan perintah kepada anak.</p>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-sky-100/90 border-2 border-sky-400 text-center flex items-center gap-3 shadow-sm">
+                  <span className="text-2xl">👧</span>
+                  <div className="text-left">
+                    <h4 className="font-heading font-bold text-xs text-sky-950 uppercase">orang kedua</h4>
+                    <p className="text-[11px] text-sky-900">Kata ganti nama "kamu" yang menerima suruhan.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* PAGE 2: Peta Minda 4 Jenis Kata Perintah (Page 12) */}
+      {/* PAGE 2: 4 Jenis Ayat Perintah (Page 14 - DAHULU SEPERTI DIMINTA) */}
       {pageIndex === 2 && (
+        <div className="flex-1 flex flex-col justify-center my-2 animate-fade-in">
+          <div className="text-center mb-3">
+            <span className="px-3 py-1 bg-amber-200 text-amber-900 rounded-full font-heading font-black text-xs uppercase tracking-wider">
+              Halaman 1: Jenis Ayat Perintah
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-heading font-black text-slate-900 mt-1">
+              4 Jenis Ayat Perintah
+            </h2>
+            <p className="text-xs text-amber-800 font-semibold mt-1">
+              Fahami 4 tujuan utama ayat perintah dituturkan mengikut konteks
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-2xl mx-auto w-full">
+            <div className="p-4 rounded-3xl bg-amber-50 border-3 border-amber-400 shadow-md transform hover:scale-102 transition-all">
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="font-heading font-black text-lg text-amber-900 flex items-center gap-1.5">
+                  <span>🤝</span>
+                  <span>Ayat Permintaan</span>
+                </h3>
+                <AudioSpeakerButton textToSpeak="Ayat permintaan: Ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan." size="sm" />
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                Ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan.
+              </p>
+              <div className="mt-2 pt-2 border-t border-amber-200/80 text-[11px] font-bold text-amber-800">
+                Contoh: <em>“Tolong tutup suis lampu itu.”</em>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-3xl bg-emerald-50 border-3 border-emerald-400 shadow-md transform hover:scale-102 transition-all">
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="font-heading font-black text-lg text-emerald-900 flex items-center gap-1.5">
+                  <span>📢</span>
+                  <span>Ayat Suruhan</span>
+                </h3>
+                <AudioSpeakerButton textToSpeak="Ayat suruhan: Ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan." size="sm" />
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                Ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan.
+              </p>
+              <div className="mt-2 pt-2 border-t border-emerald-200/80 text-[11px] font-bold text-emerald-800">
+                Contoh: <em>“Kemas bilik tidur kamu sekarang.”</em>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-3xl bg-rose-50 border-3 border-rose-400 shadow-md transform hover:scale-102 transition-all">
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="font-heading font-black text-lg text-rose-900 flex items-center gap-1.5">
+                  <span>🚫</span>
+                  <span>Ayat Larangan</span>
+                </h3>
+                <AudioSpeakerButton textToSpeak="Ayat larangan: Ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu." size="sm" />
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                Ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu.
+              </p>
+              <div className="mt-2 pt-2 border-t border-rose-200/80 text-[11px] font-bold text-rose-800">
+                Contoh: <em>“Jangan buang sampah di sini.”</em>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-3xl bg-sky-50 border-3 border-sky-400 shadow-md transform hover:scale-102 transition-all">
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="font-heading font-black text-lg text-sky-900 flex items-center gap-1.5">
+                  <span>🌸</span>
+                  <span>Ayat Silaan</span>
+                </h3>
+                <AudioSpeakerButton textToSpeak="Ayat silaan: Ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang." size="sm" />
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                Ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang.
+              </p>
+              <div className="mt-2 pt-2 border-t border-sky-200/80 text-[11px] font-bold text-sky-800">
+                Contoh: <em>“Sila duduk di kerusi hadapan.”</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PAGE 3: Peta Minda 4 Jenis Kata Perintah (Page 12) */}
+      {pageIndex === 3 && (
         <div className="flex-1 flex flex-col justify-center my-1 animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-2">
             <BlueBirdVector size={45} perched={true} />
             <h2 className="text-2xl sm:text-4xl font-heading font-black text-slate-900">
-              Jenis kata perintah
+              Jenis Kata Perintah
             </h2>
             <BlueBirdVector size={45} flip={true} perched={true} />
           </div>
@@ -250,93 +370,111 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         </div>
       )}
 
-      {/* PAGE 3: Roda 7 Kata Perintah (Page 13) */}
-      {pageIndex === 3 && (
+      {/* PAGE 4: 7 Kata Perintah Disusun Ikut Jenis Kata Perintah (Page 13) */}
+      {pageIndex === 4 && (
         <div className="flex-1 flex flex-col justify-center my-2 animate-fade-in">
           <div className="text-center mb-3">
             <h2 className="text-2xl sm:text-4xl font-heading font-black text-[#78350f]">
               7 KATA PERINTAH UTAMA
             </h2>
-            <p className="text-xs text-amber-800 font-semibold">
-              Ketahui makna dan fungsi tepat bagi setiap satu kata perintah
+            <p className="text-xs text-amber-800 font-bold">
+              Disusun mengikut 3 Kategori Jenis Kata Perintah
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-w-3xl mx-auto w-full">
-            {[
-              { num: '01', kata: 'Jangan', desc: 'Menyatakan maksud larangan atau tidak boleh melakukan sesuatu.', color: 'border-rose-300 bg-rose-50' },
-              { num: '02', kata: 'Harap', desc: 'Menyatakan maksud keinginan mendapatkan sesuatu atau meminta dilakukan sesuatu.', color: 'border-sky-300 bg-sky-50' },
-              { num: '03', kata: 'Jemput', desc: 'Menyatakan maksud mengajak atau mengundang ke majlis/makan.', color: 'border-amber-300 bg-amber-50' },
-              { num: '04', kata: 'Usah', desc: 'Menyatakan maksud larangan atau tegahan daripada melakukan sesuatu (bernada memujuk).', color: 'border-pink-300 bg-pink-50' },
-              { num: '05', kata: 'Tolong', desc: 'Menyatakan maksud meminta pertolongan atau bantuan untuknya.', color: 'border-blue-300 bg-blue-50' },
-              { num: '06', kata: 'Sila', desc: 'Meminta seseorang melakukan sesuatu dengan cara hormat dan beradab.', color: 'border-emerald-300 bg-emerald-50' },
-              { num: '07', kata: 'Minta', desc: 'Menyatakan maksud ingin akan sesuatu atau mengharapkan kerjasama.', color: 'border-purple-300 bg-purple-50' }
-            ].map((k) => (
-              <div
-                key={k.num}
-                onClick={() => sound.playClick()}
-                className={`p-3 rounded-2xl border-2 ${k.color} shadow-sm hover:shadow-md cursor-pointer transition-all transform hover:-translate-y-0.5`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-black px-2 py-0.5 rounded-full bg-white/80 text-slate-700">
-                    {k.num}
-                  </span>
-                  <span className="font-heading font-black text-lg text-slate-900">{k.kata}</span>
-                  <AudioSpeakerButton textToSpeak={`${k.kata}. ${k.desc}`} size="sm" />
-                </div>
-                <p className="text-[11px] text-slate-700 font-medium leading-tight">
-                  {k.desc}
-                </p>
+          <div className="space-y-3 max-w-3xl mx-auto w-full">
+            {/* Kategori 1: Kata Larangan */}
+            <div className="p-3 rounded-2xl bg-rose-50/90 border-2 border-rose-300 shadow-sm">
+              <div className="flex items-center gap-2 mb-2 pb-1 border-b border-rose-200">
+                <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-heading font-black text-xs uppercase tracking-wider">
+                  🚫 Kategori: Kata Larangan
+                </span>
+                <span className="text-[11px] text-rose-800 font-semibold">
+                  (Menegah atau melarang sesuatu perbuatan)
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* PAGE 4: 4 Jenis Ayat Perintah (Page 14) */}
-      {pageIndex === 4 && (
-        <div className="flex-1 flex flex-col justify-center my-2 animate-fade-in">
-          <div className="text-center mb-3">
-            <h2 className="text-2xl sm:text-4xl font-heading font-black text-slate-900">
-              Jenis Ayat Perintah
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto w-full">
-            <div className="p-4 rounded-2xl bg-amber-50 border-3 border-amber-400 shadow-sm">
-              <h3 className="font-heading font-black text-lg text-amber-900 mb-1">
-                Ayat permintaan
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700">
-                Ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan.
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { num: '01', kata: 'Jangan', desc: 'Menyatakan maksud larangan atau tidak boleh melakukan sesuatu.' },
+                  { num: '02', kata: 'Usah', desc: 'Menyatakan maksud larangan atau tegahan daripada melakukan sesuatu (bernada memujuk).' }
+                ].map((k) => (
+                  <div
+                    key={k.kata}
+                    onClick={() => sound.playClick()}
+                    className="p-2.5 rounded-xl bg-white border border-rose-300 shadow-2xs hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">{k.num}</span>
+                      <span className="font-heading font-black text-base text-rose-950">{k.kata}</span>
+                      <AudioSpeakerButton textToSpeak={`${k.kata}. ${k.desc}`} size="sm" />
+                    </div>
+                    <p className="text-[11px] text-slate-700 font-medium leading-tight">{k.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-emerald-50 border-3 border-emerald-400 shadow-sm">
-              <h3 className="font-heading font-black text-lg text-emerald-900 mb-1">
-                Ayat suruhan
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700">
-                Ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan.
-              </p>
+            {/* Kategori 2: Kata Silaan */}
+            <div className="p-3 rounded-2xl bg-sky-50/90 border-2 border-sky-300 shadow-sm">
+              <div className="flex items-center gap-2 mb-2 pb-1 border-b border-sky-200">
+                <span className="px-2.5 py-0.5 rounded-full bg-sky-600 text-white font-heading font-black text-xs uppercase tracking-wider">
+                  🌸 Kategori: Kata Silaan
+                </span>
+                <span className="text-[11px] text-sky-800 font-semibold">
+                  (Menjemput atau mempersilakan secara hormat)
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { num: '03', kata: 'Sila', desc: 'Meminta seseorang melakukan sesuatu dengan cara hormat dan beradab.' },
+                  { num: '04', kata: 'Jemput', desc: 'Menyatakan maksud mengajak atau mengundang ke majlis/makan.' }
+                ].map((k) => (
+                  <div
+                    key={k.kata}
+                    onClick={() => sound.playClick()}
+                    className="p-2.5 rounded-xl bg-white border border-sky-300 shadow-2xs hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">{k.num}</span>
+                      <span className="font-heading font-black text-base text-sky-950">{k.kata}</span>
+                      <AudioSpeakerButton textToSpeak={`${k.kata}. ${k.desc}`} size="sm" />
+                    </div>
+                    <p className="text-[11px] text-slate-700 font-medium leading-tight">{k.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-rose-50 border-3 border-rose-400 shadow-sm">
-              <h3 className="font-heading font-black text-lg text-rose-900 mb-1">
-                Ayat larangan
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700">
-                Ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-sky-50 border-3 border-sky-400 shadow-sm">
-              <h3 className="font-heading font-black text-lg text-sky-900 mb-1">
-                Ayat silaan
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700">
-                Ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang.
-              </p>
+            {/* Kategori 3: Kata Permintaan */}
+            <div className="p-3 rounded-2xl bg-amber-50/90 border-2 border-amber-300 shadow-sm">
+              <div className="flex items-center gap-2 mb-2 pb-1 border-b border-amber-200">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-600 text-white font-heading font-black text-xs uppercase tracking-wider">
+                  🤝 Kategori: Kata Permintaan
+                </span>
+                <span className="text-[11px] text-amber-800 font-semibold">
+                  (Memohon bantuan, sokongan, atau pertolongan)
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {[
+                  { num: '05', kata: 'Tolong', desc: 'Menyatakan maksud meminta pertolongan atau bantuan untuknya.' },
+                  { num: '06', kata: 'Minta', desc: 'Menyatakan maksud ingin akan sesuatu atau mengharapkan kerjasama.' },
+                  { num: '07', kata: 'Harap', desc: 'Menyatakan maksud keinginan mendapatkan sesuatu atau meminta dilakukan sesuatu.' }
+                ].map((k) => (
+                  <div
+                    key={k.kata}
+                    onClick={() => sound.playClick()}
+                    className="p-2.5 rounded-xl bg-white border border-amber-300 shadow-2xs hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">{k.num}</span>
+                      <span className="font-heading font-black text-base text-amber-950">{k.kata}</span>
+                      <AudioSpeakerButton textToSpeak={`${k.kata}. ${k.desc}`} size="sm" />
+                    </div>
+                    <p className="text-[11px] text-slate-700 font-medium leading-tight">{k.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -402,7 +540,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-purple-300">Cikgu Syafiqah</h4>
-                        <span className="text-[9px] text-purple-200 block font-semibold">Guru Bahasa Melayu</span>
+                        <span className="text-[10px] text-purple-200 font-bold block">Topik: Ayat Silaan & Permintaan</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -435,7 +573,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-amber-300">Cikgu Freshcy</h4>
-                        <span className="text-[9px] text-amber-200 block font-semibold">Inovator Digital PdP</span>
+                        <span className="text-[10px] text-amber-200 font-bold block">Topik: Ayat Larangan</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -468,7 +606,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                       </div>
                       <div>
                         <h4 className="text-xs font-heading font-black text-sky-300">Cikgu Aaron</h4>
-                        <span className="text-[9px] text-sky-200 block font-semibold">Pakar Tatabahasa PdP</span>
+                        <span className="text-[10px] text-sky-200 font-bold block">Topik: Ayat Suruhan</span>
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
@@ -495,6 +633,13 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         </div>
       )}
 
+      {/* PAGE 6: Video Teater Drama SK Seri Kundang (Jangan Toleh Belakang) */}
+      {pageIndex === 6 && (
+        <div className="flex-1 flex flex-col justify-center items-center my-1 animate-fade-in w-full">
+          <TeaterDramaVideo />
+        </div>
+      )}
+
       {/* Bottom Navigation */}
       <div className="flex items-center justify-between w-full pt-2">
         <WoodArrowButton
@@ -504,7 +649,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
         />
 
         <div className="text-xs font-bold text-amber-900 bg-amber-200/70 px-4 py-1.5 rounded-full">
-          Halaman {pageIndex + 1} daripada 6
+          Halaman {pageIndex + 1} daripada 7
         </div>
 
         <WoodArrowButton
