@@ -148,6 +148,8 @@ export const MarioGame: React.FC<MarioGameProps> = ({
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; text: string } | null>(null);
   const [stageFinished, setStageFinished] = useState(false);
   const [powerupAnimation, setPowerupAnimation] = useState(false);
+  const [showCastleLocked, setShowCastleLocked] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
   // Controls refs
   const keysPressed = useRef<{ [key: string]: boolean }>({});
@@ -155,6 +157,23 @@ export const MarioGame: React.FC<MarioGameProps> = ({
 
   const WORLD_WIDTH = 1580;
   const GROUND_Y = 250;
+  const jumpY = Math.max(0, GROUND_Y - posY);
+
+  const handleRetryAfterGameOver = () => {
+    setGameOver(false);
+    setPosX(60);
+    setPosY(GROUND_Y);
+    setVelY(0);
+    setLives(3);
+    setScore(0);
+    setCoins(0);
+    setBlocks(MARIO_QUESTIONS.map(b => ({ ...b, answered: false })));
+    setWorldCoins(INITIAL_WORLD_COINS.map(c => ({ ...c, collected: false })));
+    setBlinkingBlockId(null);
+    setBouncingBlockId(null);
+    setCoinPops([]);
+    sound.playClick();
+  };
 
   // Viewport camera offset (smooth side-scroller)
   const cameraX = Math.max(0, Math.min(posX - 220, WORLD_WIDTH - 640));
@@ -317,7 +336,13 @@ export const MarioGame: React.FC<MarioGameProps> = ({
         const next = Math.max(30, Math.min(prev + speed, WORLD_WIDTH - 60));
         // Check if reached Castle & Flagpole
         if (next >= 1430 && !stageFinished) {
-          triggerVictory();
+          if (blocks.every((b) => b.answered)) {
+            triggerVictory();
+          } else {
+            setShowCastleLocked(true);
+            setTimeout(() => setShowCastleLocked(false), 2500);
+            return 1420;
+          }
         }
         return next;
       });
@@ -432,6 +457,13 @@ export const MarioGame: React.FC<MarioGameProps> = ({
       // Sound effect salah yang sesuai (womp-womp descending quiz buzzer)
       sound.playWrong();
       setFeedback({ isCorrect: false, text: choice.maklumBalas });
+      setLives((prev) => {
+        const next = Math.max(0, prev - 1);
+        if (next === 0) {
+          setTimeout(() => setGameOver(true), 1200);
+        }
+        return next;
+      });
     }
   };
 
@@ -909,7 +941,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                 onClick={() => {
                   setStageFinished(false);
                   setPosX(60);
-                  setJumpY(0);
+                  setPosY(GROUND_Y);
                   setVelY(0);
                   setLives(3);
                   setScore(0);

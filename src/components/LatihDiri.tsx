@@ -3,6 +3,8 @@ import confetti from 'canvas-confetti';
 import { TopNavBar, WoodArrowButton } from './OrganicNav';
 import { sound } from '../utils/audio';
 import { TeacherStandee, TeacherId, TEACHER_PROFILES } from './TeacherCharacters';
+import { BoyVector } from './IllustratedCharacters';
+import { FoliageForeground } from './StoryGraphics';
 
 interface LatihDiriProps {
   onBack: () => void;
