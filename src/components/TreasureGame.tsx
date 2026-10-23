@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { TopNavBar, WoodArrowButton } from './OrganicNav';
+import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
 import { TreasureChestVector, BoyVector } from './IllustratedCharacters';
 import { ThreePiratesIllustration } from './StoryGraphics';
 import { Check, X, Compass, Map, ShieldAlert, Award, Sparkles, Navigation, Lock } from 'lucide-react';
@@ -240,18 +240,9 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   };
 
   return (
-    <div
-      className="relative min-h-[580px] md:min-h-[640px] lg:min-h-[700px] w-full mx-auto rounded-3xl overflow-hidden border-4 border-amber-400 shadow-2xl flex flex-col justify-between p-3 sm:p-6 transition-all duration-300"
-      style={{
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3)), url('${
-          stage === 'playing'
-            ? '/assets/aistudio/halaman_soalan_game_harta_karun_95f4468a.jpg'
-            : '/assets/aistudio/halaman_game_harta_karun_061d3e11.jpg'
-        }')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
+    <div className="relative min-h-[580px] md:min-h-[640px] lg:min-h-[700px] w-full mx-auto rounded-3xl overflow-hidden border-4 border-amber-400 shadow-2xl bg-[#faf5ef] flex flex-col justify-between p-3 sm:p-6">
+      {/* Background vintage parchment / map elements */}
+      <div className="absolute inset-0 pointer-events-none opacity-15 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]" />
 
       {/* Top Navbar */}
       <TopNavBar
@@ -264,7 +255,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
             ? curMisi.misiTajuk
             : stage === 'map'
             ? 'Peta Misi Pulau Harta Karun'
-            : 'Kembara Harta Karun'
+            : 'Permainan Harta Karun'
         }
       />
 
@@ -279,7 +270,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black font-heading text-[#78350f] tracking-wider drop-shadow-md uppercase mb-2">
-            GAME KEMBARA HARTA KARUN
+            PERMAINAN HARTA KARUN
           </h1>
           <p className="text-amber-800 text-sm sm:text-base font-semibold max-w-md">
             Jelajahi peta pulau rahsia mengikut misi berperingkat untuk mengumpul semua syiling emas ke dalam peti lanun!
@@ -556,6 +547,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
                 </span>
                 {curMisi.sentenceEnd && <span> {curMisi.sentenceEnd}</span>}
               </p>
+              <AudioSpeakerButton textToSpeak={curMisi.fullSentence} size="md" />
             </div>
 
             {selectedSide !== null && (

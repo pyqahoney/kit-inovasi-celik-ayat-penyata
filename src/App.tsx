@@ -28,7 +28,6 @@ import { NotaDanVideo } from './components/NotaDanVideo';
 import { ARModule } from './components/ARModule';
 import { PapanPemukaPBS } from './components/PapanPemukaPBS';
 import { DokumentasiPembangun } from './components/DokumentasiPembangun';
-import { KatakLompatLogo, KembaraHartaKarunLogo, WiraMarioLogo, KuasaPacmanLogo } from './components/GameLogoBadges';
 import { INITIAL_STUDENTS, hitungTahapPenguasaan } from './data/learningContent';
 import { StudentPBSRecord } from './types';
 import { sound } from './utils/audio';
@@ -169,13 +168,7 @@ export default function App() {
     const saved = localStorage.getItem('celik_perintah_students');
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((s: StudentPBSRecord) => ({
-            ...s,
-            kelas: '5 Bestari'
-          }));
-        }
+        return JSON.parse(saved);
       } catch {
         // fallback
       }
@@ -193,31 +186,7 @@ export default function App() {
   const activeStudent =
     students.find((s) => s.id === currentStudentId) || students[0];
 
-  // Synchronize Background Music with current screen
-  // Plays the Nintendo Cafe song on all kit screens (with loop & audio ducking),
-  // but stops it and switches to game-specific BGM when entering games,
-  // and resumes it when leaving games.
-  useEffect(() => {
-    if (!soundEnabled) {
-      sound.stopBGM();
-      return;
-    }
-
-    if (currentScreen === 'game_mario') {
-      sound.playModuleBGM('mario');
-    } else if (currentScreen === 'game_frog') {
-      sound.playModuleBGM('frog');
-    } else if (currentScreen === 'game_treasure') {
-      sound.playModuleBGM('treasure');
-    } else if (currentScreen === 'game_pacman') {
-      sound.playModuleBGM('pacman');
-    } else {
-      // Loop the Nintendo Cafe background song on all other screens
-      sound.playModuleBGM('default');
-    }
-  }, [currentScreen, soundEnabled]);
-
-  // Global button click SFX and cute background music integration on mount
+  // Global button click SFX and cute background music integration
   useEffect(() => {
     // 1. Universal click sound on every button or interactive element
     const handleGlobalClick = (e: MouseEvent) => {
@@ -234,7 +203,7 @@ export default function App() {
     // 2. Start cute BGM on user's first interaction (satisfying browser autoplay policy)
     const handleFirstInteraction = () => {
       if (sound.enabled) {
-        sound.playModuleBGM('default');
+        sound.startBGM();
       }
       window.removeEventListener('pointerdown', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
@@ -245,9 +214,6 @@ export default function App() {
     window.addEventListener('pointerdown', handleFirstInteraction, { once: true });
     window.addEventListener('keydown', handleFirstInteraction, { once: true });
     window.addEventListener('touchstart', handleFirstInteraction, { once: true });
-
-    // Also attempt immediate autoplay
-    sound.playModuleBGM('default');
 
     return () => {
       document.removeEventListener('click', handleGlobalClick, { capture: true });
@@ -267,11 +233,7 @@ export default function App() {
       sound.stopSpeech();
       sound.stopBGM();
     } else {
-      if (currentScreen === 'game_mario') sound.playModuleBGM('mario');
-      else if (currentScreen === 'game_frog') sound.playModuleBGM('frog');
-      else if (currentScreen === 'game_treasure') sound.playModuleBGM('treasure');
-      else if (currentScreen === 'game_pacman') sound.playModuleBGM('pacman');
-      else sound.playModuleBGM('default');
+      sound.startBGM();
     }
   };
 
@@ -342,20 +304,15 @@ export default function App() {
   };
 
 
-  const isLandscapeWide = [
-    'welcome',
-    'emotion',
-    'symbols',
-    'home',
+  const isGameOrTheaterScreen = [
     'game_mario',
     'game_pacman',
     'game_treasure',
     'game_frog',
-    'theater',
-    'pbs_dashboard'
+    'theater'
   ].includes(currentScreen);
 
-  const containerMaxWidth = isLandscapeWide
+  const containerMaxWidth = isGameOrTheaterScreen
     ? 'w-full max-w-md md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto'
     : 'w-full max-w-md sm:max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto';
 
@@ -513,30 +470,23 @@ export default function App() {
             SCREEN 1: SELAMAT DATANG (Storyboard Page 1)
            ======================================================== */}
         {currentScreen === 'welcome' && (
-          <div
-            className="relative min-h-[500px] md:min-h-[540px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-3 sm:p-5 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28)), url('/assets/aistudio/halaman_selamat_datang_1b346c8c.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             {/* Cute Smiling Sun in top-left corner */}
             <div className="absolute top-2 left-3 z-10">
-              <CuteSunVector size={65} />
+              <CuteSunVector size={72} />
             </div>
 
             {/* Flying Blue Birds in the sky matching Page 1 */}
-            <div className="absolute top-10 right-28 z-10 hidden sm:block">
-              <BlueBirdVector size={45} />
+            <div className="absolute top-12 right-20 z-10">
+              <BlueBirdVector size={50} />
             </div>
-            <div className="absolute top-18 right-12 z-10 hidden sm:block">
-              <BlueBirdVector size={35} flip={true} />
+            <div className="absolute top-24 right-8 z-10">
+              <BlueBirdVector size={38} flip={true} />
             </div>
 
             {/* Fluttering Butterfly */}
-            <div className="absolute top-28 left-8 z-10 hidden sm:block">
-              <ButterflyVector size={32} />
+            <div className="absolute top-36 left-12 z-10">
+              <ButterflyVector size={35} />
             </div>
 
             {/* Top Bar with red X and Audio */}
@@ -546,165 +496,157 @@ export default function App() {
               onHelp={() => setCurrentScreen('symbols')}
             />
 
-            {/* Main Landscape Stage: Karikatur Cikgu di sebelah Bahagian Akses */}
-            <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 my-2 z-20 px-2 sm:px-6">
-              {/* LEFT COLUMN (Landscape): Karikatur Cikgu + Speech Bubble + Teacher Switcher */}
-              <div className="w-full md:w-5/12 flex flex-col items-center justify-center shrink-0">
-                <TeacherStandee
-                  teacherId={selectedTeacherId}
-                  size="md"
-                  showBubble={true}
-                  bubbleText={`“Hai! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Jom belajar ayat perintah bersama cikgu!”`}
-                />
+            {/* Title Banner & Paper Note matching Page 1 */}
+            <div className="flex-1 flex flex-col items-center justify-center my-2 text-center z-20">
+              <h1 className="text-4xl sm:text-6xl font-black font-heading text-rose-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] tracking-wide mb-3">
+                Selamat Datang
+              </h1>
 
-                {/* Quick Teacher Switcher Pills */}
-                <div className="flex items-center gap-1 mt-2.5 p-1 bg-white/95 rounded-full border border-amber-300 shadow-md">
-                  {(['syafiqah', 'aaron', 'freshcy'] as TeacherId[]).map((tid) => {
-                    const prof = TEACHER_PROFILES[tid];
-                    const isCur = selectedTeacherId === tid;
-                    return (
-                      <button
-                        key={tid}
-                        onClick={() => handleSelectTeacher(tid)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-heading font-black transition-all flex items-center gap-1 ${
-                          isCur
-                            ? 'bg-amber-500 text-white shadow-xs scale-105'
-                            : 'text-slate-700 hover:bg-amber-100'
-                        }`}
-                        title={`${prof.nama} (${prof.gelaran})`}
-                      >
-                        <span className="w-4 h-4 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
-                          <img src={prof.avatarUrl} alt="" className="w-full h-full object-cover" />
-                        </span>
-                        <span className="hidden sm:inline">{prof.nama.replace('Cikgu ', '')}</span>
-                      </button>
-                    );
-                  })}
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setShowTeacherTrioModal(true);
-                    }}
-                    className="px-2.5 py-1 rounded-full text-[11px] font-heading font-extrabold bg-purple-100 text-purple-900 hover:bg-purple-200 border border-purple-300 ml-0.5"
-                    title="Lihat profil lengkap 3 cikgu"
-                  >
-                    3 Guru 👥
-                  </button>
-                </div>
+              {/* Note with Paperclip & Red Pin */}
+              <div className="relative max-w-md w-full bg-white/95 rounded-2xl p-5 border-2 border-slate-300 shadow-xl transform -rotate-1 hover:rotate-0 transition-transform">
+                {/* Paperclip */}
+                <div className="absolute -top-3 left-6 text-2xl">📎</div>
+                {/* Red pushpin */}
+                <div className="absolute -top-3 right-6 text-2xl">📍</div>
+
+                <h2 className="text-2xl sm:text-3xl font-heading font-black text-slate-900 leading-tight">
+                  Tajuk: Ayat Perintah
+                </h2>
+                <p className="text-lg font-heading font-bold text-amber-700 mt-1">
+                  Tahun 5 (KSSR Semakan)
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Pembelajaran Interaktif & Modul AR
+                </p>
               </div>
 
-              {/* RIGHT COLUMN (Landscape): Tajuk Nota, 3 Pilihan Akses & Butang Mula Emas */}
-              <div className="w-full md:w-7/12 flex flex-col items-center justify-center space-y-3.5">
-                <div className="px-6 py-2 bg-white/95 backdrop-blur-md rounded-3xl border-3 border-rose-300 shadow-xl">
-                  <h1 className="text-3xl sm:text-5xl font-black font-heading text-rose-500 drop-shadow-sm tracking-wide text-center">
-                    Selamat Datang
-                  </h1>
-                </div>
-
-                {/* Note with Paperclip & Red Pin */}
-                <div className="relative max-w-lg w-full bg-white/95 rounded-2xl p-4 border-2 border-slate-300 shadow-xl transform -rotate-0.5 hover:rotate-0 transition-transform">
-                  <div className="absolute -top-3 left-6 text-2xl">📎</div>
-                  <div className="absolute -top-3 right-6 text-2xl">📍</div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-heading font-black text-slate-900 leading-tight">
-                        Tajuk: Ayat Perintah
-                      </h2>
-                      <p className="text-sm font-heading font-bold text-amber-700 mt-0.5">
-                        Tahun 5 Bestari (KSSR Semakan)
-                      </p>
-                    </div>
-                    <span className="text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-xl shadow-xs">
-                      Modul Interaktif AR 🚀
-                    </span>
+              {/* 3 Main Role Access Options */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl w-full my-4">
+                {/* 1. Akses Murid (Tanpa Password) */}
+                <button
+                  onClick={() => {
+                    setUserRole('student');
+                    sound.playClick();
+                    setCurrentScreen('home');
+                  }}
+                  className="group p-3.5 rounded-3xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-amber-950 font-heading border-3 border-amber-200 shadow-[0_5px_0_#92400e] active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-white/90 flex items-center justify-center text-2xl shadow-xs mb-1.5 group-hover:rotate-6 transition-transform">
+                    👦
                   </div>
-                </div>
+                  <span className="text-base font-black text-white drop-shadow-xs">Akses Murid</span>
+                  <span className="text-[10px] font-bold text-amber-100 bg-amber-950/30 px-2 py-0.5 rounded-full mt-1">
+                    Tiada Password
+                  </span>
+                  <span className="text-[10px] text-amber-950 font-black mt-2 bg-white/80 px-2.5 py-1 rounded-xl w-full shadow-xs">
+                    Mula Belajar 🚀
+                  </span>
+                </button>
 
-                {/* 3 Main Role Access Options */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-lg w-full">
-                  {/* 1. Akses Murid (Tanpa Password -> Semakan Emosi) */}
-                  <button
-                    onClick={() => {
-                      setUserRole('student');
-                      sound.playClick();
-                      setCurrentScreen('emotion');
-                    }}
-                    className="group p-3 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-amber-950 font-heading border-3 border-amber-200 shadow-[0_4px_0_#92400e] active:translate-y-1 active:shadow-[0_1px_0_#92400e] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/90 flex items-center justify-center text-xl shadow-xs mb-1 group-hover:rotate-6 transition-transform">
-                      👦
-                    </div>
-                    <span className="text-sm font-black text-white drop-shadow-xs">Akses Murid</span>
-                    <span className="text-[9px] font-bold text-amber-100 bg-amber-950/30 px-2 py-0.5 rounded-full mt-0.5">
-                      Tiada Password
-                    </span>
-                    <span className="text-[10px] text-amber-950 font-black mt-1.5 bg-white/85 px-2 py-0.5 rounded-lg w-full shadow-xs">
-                      Mula Belajar 🚀
-                    </span>
-                  </button>
+                {/* 2. Akses Guru (Perlu Password) */}
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setTeacherAuthError('');
+                    setTeacherPasswordInput('');
+                    setShowTeacherAuthModal(true);
+                  }}
+                  className="group p-3.5 rounded-3xl bg-gradient-to-b from-emerald-500 to-teal-700 hover:from-emerald-400 hover:to-teal-600 text-white font-heading border-3 border-emerald-300 shadow-[0_5px_0_#065f46] active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
+                >
+                  <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-xs mb-1.5 group-hover:rotate-6 transition-transform bg-purple-100">
+                    <img src={TEACHER_PROFILES[selectedTeacherId].avatarUrl} alt="Akses Guru" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-base font-black text-white drop-shadow-xs">Akses Guru</span>
+                  <span className="text-[10px] font-bold text-emerald-100 bg-emerald-950/40 px-2 py-0.5 rounded-full mt-1 flex items-center gap-1">
+                    <Lock size={10} /> Perlu Password
+                  </span>
+                  <span className="text-[10px] text-emerald-950 font-black mt-2 bg-emerald-100 px-2.5 py-1 rounded-xl w-full shadow-xs">
+                    Bilik Guru PBS 🔑
+                  </span>
+                </button>
 
-                  {/* 2. Akses Guru (Perlu Password) */}
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setTeacherAuthError('');
-                      setTeacherPasswordInput('');
-                      setShowTeacherAuthModal(true);
-                    }}
-                    className="group p-3 rounded-2xl bg-gradient-to-b from-emerald-500 to-teal-700 hover:from-emerald-400 hover:to-teal-600 text-white font-heading border-3 border-emerald-300 shadow-[0_4px_0_#065f46] active:translate-y-1 active:shadow-[0_1px_0_#065f46] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
-                  >
-                    <div className="w-10 h-10 rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-xs mb-1 group-hover:rotate-6 transition-transform bg-purple-100">
-                      <img src={TEACHER_PROFILES[selectedTeacherId].avatarUrl} alt="Akses Guru" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="text-sm font-black text-white drop-shadow-xs">Akses Guru</span>
-                    <span className="text-[9px] font-bold text-emerald-100 bg-emerald-950/40 px-2 py-0.5 rounded-full mt-0.5 flex items-center gap-1">
-                      <Lock size={9} /> Perlu Password
-                    </span>
-                    <span className="text-[10px] text-emerald-950 font-black mt-1.5 bg-emerald-100 px-2 py-0.5 rounded-lg w-full shadow-xs">
-                      Bilik Guru PBS 🔑
-                    </span>
-                  </button>
+                {/* 3. Akses Orang Luar (Tanpa Password) */}
+                <button
+                  onClick={() => {
+                    setUserRole('guest');
+                    sound.playClick();
+                    setCurrentScreen('home');
+                  }}
+                  className="group p-3.5 rounded-3xl bg-gradient-to-b from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-heading border-3 border-sky-200 shadow-[0_5px_0_#1e40af] active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-white/90 flex items-center justify-center text-2xl shadow-xs mb-1.5 group-hover:rotate-6 transition-transform text-sky-800">
+                    🌍
+                  </div>
+                  <span className="text-base font-black text-white drop-shadow-xs">Akses Orang Luar</span>
+                  <span className="text-[10px] font-bold text-sky-100 bg-blue-950/40 px-2 py-0.5 rounded-full mt-1">
+                    Tiada Password
+                  </span>
+                  <span className="text-[10px] text-blue-950 font-black mt-2 bg-white/80 px-2.5 py-1 rounded-xl w-full shadow-xs">
+                    Teroka Bebas 👁️
+                  </span>
+                </button>
+              </div>
 
-                  {/* 3. Akses Orang Luar (Tanpa Password -> Semakan Emosi) */}
-                  <button
-                    onClick={() => {
-                      setUserRole('guest');
-                      sound.playClick();
-                      setCurrentScreen('emotion');
-                    }}
-                    className="group p-3 rounded-2xl bg-gradient-to-b from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-heading border-3 border-sky-200 shadow-[0_4px_0_#1e40af] active:translate-y-1 active:shadow-[0_1px_0_#1e40af] transition-all transform hover:scale-102 flex flex-col items-center justify-between text-center"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/90 flex items-center justify-center text-xl shadow-xs mb-1 group-hover:rotate-6 transition-transform text-sky-800">
-                      🌍
-                    </div>
-                    <span className="text-sm font-black text-white drop-shadow-xs">Orang Luar</span>
-                    <span className="text-[9px] font-bold text-sky-100 bg-blue-950/40 px-2 py-0.5 rounded-full mt-0.5">
-                      Tiada Password
-                    </span>
-                    <span className="text-[10px] text-blue-950 font-black mt-1.5 bg-white/85 px-2 py-0.5 rounded-lg w-full shadow-xs">
-                      Teroka Bebas 👁️
-                    </span>
-                  </button>
-                </div>
+              {/* Center Play Button (Golden Circular Play Button as quick start) */}
+              <div className="my-2">
+                <GoldenPlayButton
+                  onClick={() => {
+                    setUserRole('student');
+                    setCurrentScreen('home');
+                  }}
+                  size={90}
+                />
+              </div>
 
-                {/* Golden Circular Play Button & Quick Start */}
-                <div className="flex items-center justify-center gap-3 pt-1">
-                  <GoldenPlayButton
-                    onClick={() => {
-                      setUserRole('student');
-                      setCurrentScreen('emotion');
-                    }}
-                    size={74}
+              {/* Characters matching Page 1: Animated Teacher Standee with Speech & Cute White Bunny */}
+              <div className="w-full flex flex-col sm:flex-row items-center sm:items-end justify-between px-2 sm:px-8 -mb-2 pointer-events-auto gap-3">
+                {/* Active Teacher Standee with Speech Bubble & Teacher Switcher */}
+                <div className="flex flex-col items-center">
+                  <TeacherStandee
+                    teacherId={selectedTeacherId}
+                    size="md"
+                    showBubble={true}
+                    bubbleText={`“Hai! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Jom belajar ayat perintah bersama cikgu!”`}
                   />
-                  <div className="text-left hidden sm:block">
-                    <span className="text-xs font-black text-amber-900 block font-heading">
-                      Tekan Butang Emas
-                    </span>
-                    <span className="text-[11px] text-amber-800 font-bold block">
-                      Untuk Terus Mula Belajar 🌟
-                    </span>
+
+                  {/* Quick Teacher Switcher Pills */}
+                  <div className="flex items-center gap-1 mt-1.5 p-1 bg-white/95 rounded-full border border-amber-300 shadow-sm">
+                    {(['syafiqah', 'aaron', 'freshcy'] as TeacherId[]).map((tid) => {
+                      const prof = TEACHER_PROFILES[tid];
+                      const isCur = selectedTeacherId === tid;
+                      return (
+                        <button
+                          key={tid}
+                          onClick={() => handleSelectTeacher(tid)}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-heading font-black transition-all flex items-center gap-1 ${
+                            isCur
+                              ? 'bg-amber-500 text-white shadow-xs scale-105'
+                              : 'text-slate-700 hover:bg-amber-100'
+                          }`}
+                          title={`${prof.nama} (${prof.gelaran})`}
+                        >
+                          <span className="w-3.5 h-3.5 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
+                            <img src={prof.avatarUrl} alt="" className="w-full h-full object-cover" />
+                          </span>
+                          <span className="hidden sm:inline">{prof.nama.replace('Cikgu ', '')}</span>
+                        </button>
+                      );
+                    })}
+                    <button
+                      onClick={() => {
+                        sound.playClick();
+                        setShowTeacherTrioModal(true);
+                      }}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-heading font-extrabold bg-purple-100 text-purple-900 hover:bg-purple-200 border border-purple-300 ml-0.5"
+                      title="Lihat profil lengkap 3 cikgu"
+                    >
+                      3 Guru 👥
+                    </button>
                   </div>
+                </div>
+
+                <div className="hidden sm:block transform hover:scale-105 transition-transform">
+                  <BunnyVector size={100} />
                 </div>
               </div>
             </div>
@@ -718,7 +660,7 @@ export default function App() {
             <div className="flex items-center justify-between w-full pt-1 relative z-20">
               <div className="w-12" /> {/* spacer */}
               <div className="text-xs font-bold text-amber-900 bg-amber-200/90 px-4 py-1 rounded-full shadow-sm">
-                Muka Hadapan (Tahun 5 Bestari)
+                Muka Hadapan
               </div>
               <WoodArrowButton
                 direction="next"
@@ -732,14 +674,7 @@ export default function App() {
             SCREEN 2: APAKAH PERASAAN ANDA HARI INI? (Storyboard Page 2)
            ======================================================== */}
         {currentScreen === 'emotion' && (
-          <div
-            className="relative min-h-[500px] md:min-h-[540px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-3 sm:p-5 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(240, 249, 255, 0.45), rgba(224, 242, 254, 0.55)), url('/assets/aistudio/halaman_selamat_datang_1b346c8c.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             {/* Sun in top right corner matching Page 2 */}
             <div className="absolute top-2 right-4 z-10">
               <CuteSunVector size={72} />
@@ -761,166 +696,117 @@ export default function App() {
               onHelp={() => setCurrentScreen('symbols')}
             />
 
-            {/* Main Landscape Stage: 2 Columns */}
-            <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-2 z-20 px-2 sm:px-6">
-              {/* LEFT COLUMN: Tajuk, Speaker & Butang Pilihan Emosi / Kad Semangat */}
-              <div className="w-full md:w-7/12 flex flex-col items-center justify-center text-center">
-                <div className="px-5 py-2.5 bg-white/95 backdrop-blur-md rounded-3xl border-3 border-rose-300 shadow-xl flex items-center justify-center gap-3 mb-2">
-                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black font-heading text-rose-500 drop-shadow-sm">
-                    Apakah perasaan anda hari ini?
-                  </h1>
-                  <AudioSpeakerButton
-                    textToSpeak="Apakah perasaan anda hari ini? Tekan muka gembira jika anda bersemangat untuk belajar!"
-                    size="md"
-                  />
-                </div>
-
-                {/* Words of Encouragement after student presses emotion button */}
-                {encouragementData ? (
-                  <div className="relative max-w-md w-full p-4 sm:p-5 rounded-3xl bg-white/95 border-4 border-amber-400 shadow-2xl animate-fade-in text-center my-2">
-                    {/* Graphical Banner matching emotion */}
-                    {encouragementData.type === 'happy' ? (
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-2xl shadow-sm animate-bounce">
-                          🌟
-                        </div>
-                        <div className="w-12 h-12 rounded-2xl bg-orange-100 border-2 border-orange-400 flex items-center justify-center text-2xl shadow-sm">
-                          😊
-                        </div>
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-2xl shadow-sm animate-pulse">
-                          🏆
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-sky-100 border-2 border-sky-400 flex items-center justify-center text-2xl shadow-sm animate-pulse">
-                          🌈
-                        </div>
-                        <div className="w-12 h-12 rounded-2xl bg-pink-100 border-2 border-pink-400 flex items-center justify-center text-2xl shadow-sm">
-                          💖
-                        </div>
-                        <div className="w-12 h-12 rounded-2xl bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-2xl shadow-sm animate-bounce">
-                          🐰
-                        </div>
-                      </div>
-                    )}
-
-                    <h2 className="text-lg sm:text-xl font-heading font-black text-rose-500 mb-1">
-                      {encouragementData.tajuk}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-800 font-extrabold mb-2 text-emerald-800">
-                      {encouragementData.mesej}
-                    </p>
-
-                    <div className="p-2 bg-amber-50 rounded-2xl border-2 border-amber-300 text-amber-950 font-heading text-xs font-bold shadow-xs mb-3">
-                      ✨ {encouragementData.mutiaraKata}
-                    </div>
-
-                    <div className="flex items-center justify-center gap-3">
-                      <AudioSpeakerButton textToSpeak={encouragementData.speechText} size="md" />
-                      <button
-                        onClick={() => {
-                          sound.playSuccess();
-                          setEncouragementData(null);
-                          setCurrentScreen('symbols');
-                        }}
-                        className="px-5 py-2.5 rounded-2xl bg-gradient-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-heading font-black text-xs sm:text-sm shadow-[0_4px_0_#b45309] active:translate-y-1 transition-all flex items-center gap-1.5 transform hover:scale-102"
-                      >
-                        <span>Jom Mula!</span>
-                        <span>➔</span>
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => setEncouragementData(null)}
-                      className="mt-2 text-[10px] text-slate-500 hover:text-slate-800 underline font-bold block mx-auto cursor-pointer"
-                    >
-                      Pilih Semula Perasaan
-                    </button>
-                  </div>
-                ) : (
-                  /* The 2 Big Emoji Buttons: Happy Yellow vs Sad Blue */
-                  <div className="flex items-center justify-center gap-6 sm:gap-10 my-4">
-                    {/* Happy Emoji */}
-                    <button
-                      onClick={() => handleEmotionSelect('happy')}
-                      className="group flex flex-col items-center transform hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                      aria-label="Saya rasa gembira"
-                    >
-                      <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-amber-400 border-4 border-amber-500 shadow-xl flex items-center justify-center group-hover:ring-4 group-hover:ring-amber-300">
-                        <span className="text-5xl sm:text-6xl">😊</span>
-                      </div>
-                      <span className="mt-2 font-heading font-black text-amber-950 text-sm sm:text-base">
-                        Gembira & Ceria!
-                      </span>
-                    </button>
-
-                    {/* Sad / Thoughtful Emoji */}
-                    <button
-                      onClick={() => handleEmotionSelect('thoughtful')}
-                      className="group flex flex-col items-center transform hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                      aria-label="Saya rasa risau"
-                    >
-                      <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-sky-400 border-4 border-sky-500 shadow-xl flex items-center justify-center group-hover:ring-4 group-hover:ring-sky-300">
-                        <span className="text-5xl sm:text-6xl">🥺</span>
-                      </div>
-                      <span className="mt-2 font-heading font-black text-sky-950 text-sm sm:text-base">
-                        Perlukan Semangat
-                      </span>
-                    </button>
-                  </div>
-                )}
+            <div className="flex-1 flex flex-col items-center justify-center my-3 text-center z-10">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <h1 className="text-3xl sm:text-5xl font-black font-heading text-rose-500 drop-shadow-sm">
+                  Apakah perasaan anda hari ini?
+                </h1>
+                <AudioSpeakerButton
+                  textToSpeak="Apakah perasaan anda hari ini? Tekan muka gembira jika anda bersemangat untuk belajar!"
+                  size="md"
+                />
               </div>
 
-              {/* RIGHT COLUMN: Karikatur Guru di sebelah kanan + Teacher Switcher */}
-              <div className="w-full md:w-5/12 flex flex-col items-center justify-center shrink-0 z-20">
-                <TeacherStandee
-                  teacherId={selectedTeacherId}
-                  size="md"
-                  showBubble={true}
-                  bubbleText={
-                    encouragementData
-                      ? encouragementData.type === 'happy'
-                        ? `“Hebat! Semangatmu membakar motivasi belajar hari ini bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`
-                        : `“Jangan risau sahabat kecil, ${TEACHER_PROFILES[selectedTeacherId].nama} sedia membimbingmu sepanjang pembelajaran ini!”`
-                      : `“Hai! Cikgu nak tanya, bagaimana perasaan kamu hari ini? Pilih muka gembira atau perlukan semangat di sebelah ya!”`
-                  }
-                />
+              {/* Words of Encouragement after student presses emotion button */}
+              {encouragementData ? (
+                <div className="relative max-w-md w-full p-5 sm:p-6 rounded-3xl bg-white/95 border-4 border-amber-400 shadow-2xl animate-fade-in text-center my-3">
+                  {/* Graphical Banner matching emotion */}
+                  {encouragementData.type === 'happy' ? (
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-3xl shadow-sm animate-bounce">
+                        🌟
+                      </div>
+                      <div className="w-14 h-14 rounded-2xl bg-orange-100 border-2 border-orange-400 flex items-center justify-center text-3xl shadow-sm">
+                        😊
+                      </div>
+                      <div className="w-14 h-14 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-3xl shadow-sm animate-pulse">
+                        🏆
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <div className="w-14 h-14 rounded-2xl bg-sky-100 border-2 border-sky-400 flex items-center justify-center text-3xl shadow-sm animate-pulse">
+                        🌈
+                      </div>
+                      <div className="w-14 h-14 rounded-2xl bg-pink-100 border-2 border-pink-400 flex items-center justify-center text-3xl shadow-sm">
+                        💖
+                      </div>
+                      <div className="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-3xl shadow-sm animate-bounce">
+                        🐰
+                      </div>
+                    </div>
+                  )}
 
-                {/* Quick Teacher Switcher Pills */}
-                <div className="flex items-center gap-1 mt-2.5 p-1 bg-white/95 rounded-full border border-amber-300 shadow-md">
-                  {(['syafiqah', 'aaron', 'freshcy'] as TeacherId[]).map((tid) => {
-                    const prof = TEACHER_PROFILES[tid];
-                    const isCur = selectedTeacherId === tid;
-                    return (
-                      <button
-                        key={tid}
-                        onClick={() => handleSelectTeacher(tid)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-heading font-black transition-all flex items-center gap-1 ${
-                          isCur
-                            ? 'bg-amber-500 text-white shadow-xs scale-105'
-                            : 'text-slate-700 hover:bg-amber-100'
-                        }`}
-                        title={`${prof.nama} (${prof.gelaran})`}
-                      >
-                        <span className="w-4 h-4 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
-                          <img src={prof.avatarUrl} alt="" className="w-full h-full object-cover" />
-                        </span>
-                        <span className="hidden sm:inline">{prof.nama.replace('Cikgu ', '')}</span>
-                      </button>
-                    );
-                  })}
+                  <h2 className="text-xl sm:text-2xl font-heading font-black text-rose-500 mb-1">
+                    {encouragementData.tajuk}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-800 font-extrabold mb-2 text-emerald-800">
+                    {encouragementData.mesej}
+                  </p>
+
+                  <div className="p-2.5 bg-amber-50 rounded-2xl border-2 border-amber-300 text-amber-950 font-heading text-xs font-bold shadow-xs mb-3">
+                    ✨ {encouragementData.mutiaraKata}
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3">
+                    <AudioSpeakerButton textToSpeak={encouragementData.speechText} size="md" />
+                    <button
+                      onClick={() => {
+                        sound.playSuccess();
+                        setEncouragementData(null);
+                        setCurrentScreen('symbols');
+                      }}
+                      className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-heading font-black text-xs sm:text-sm shadow-[0_4px_0_#b45309] active:translate-y-1 transition-all flex items-center gap-1.5 transform hover:scale-102"
+                    >
+                      <span>Jom Mula!</span>
+                      <span>➔</span>
+                    </button>
+                  </div>
+
                   <button
-                    onClick={() => {
-                      sound.playClick();
-                      setShowTeacherTrioModal(true);
-                    }}
-                    className="px-2.5 py-1 rounded-full text-[11px] font-heading font-extrabold bg-purple-100 text-purple-900 hover:bg-purple-200 border border-purple-300 ml-0.5"
-                    title="Lihat profil lengkap 3 cikgu"
+                    onClick={() => setEncouragementData(null)}
+                    className="mt-2.5 text-[10px] text-slate-500 hover:text-slate-800 underline font-bold block mx-auto cursor-pointer"
                   >
-                    3 Guru 👥
+                    Pilih Semula Perasaan
                   </button>
                 </div>
+              ) : (
+                /* The 2 Big Emoji Buttons: Happy Yellow vs Sad Blue */
+                <div className="flex items-center justify-center gap-8 sm:gap-14 my-5">
+                  {/* Happy Emoji */}
+                  <button
+                    onClick={() => handleEmotionSelect('happy')}
+                    className="group flex flex-col items-center transform hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    aria-label="Saya rasa gembira"
+                  >
+                    <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-full bg-amber-400 border-4 border-amber-500 shadow-xl flex items-center justify-center group-hover:ring-4 group-hover:ring-amber-300">
+                      <span className="text-6xl sm:text-7xl">😊</span>
+                    </div>
+                    <span className="mt-2 font-heading font-bold text-amber-950 text-base">
+                      Gembira & Ceria!
+                    </span>
+                  </button>
+
+                  {/* Sad / Thoughtful Emoji */}
+                  <button
+                    onClick={() => handleEmotionSelect('thoughtful')}
+                    className="group flex flex-col items-center transform hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    aria-label="Saya rasa risau"
+                  >
+                    <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-full bg-sky-400 border-4 border-sky-500 shadow-xl flex items-center justify-center group-hover:ring-4 group-hover:ring-sky-300">
+                      <span className="text-6xl sm:text-7xl">🥺</span>
+                    </div>
+                    <span className="mt-2 font-heading font-bold text-sky-950 text-base">
+                      Perlukan Semangat
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {/* Characters matching Page 2: Explorer Boy waving & Bunny */}
+              <div className="w-full flex items-end justify-between px-6 sm:px-12 -mb-2">
+                <BunnyVector size={100} />
+                <BoyVector pose="wave" size={140} />
               </div>
             </div>
 
@@ -949,14 +835,7 @@ export default function App() {
             SCREEN 3: MAKNA SIMBOL (Storyboard Page 3)
            ======================================================== */}
         {currentScreen === 'symbols' && (
-          <div
-            className="relative min-h-[500px] md:min-h-[540px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-3 sm:p-5 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.28)), url('/assets/aistudio/halaman_panduan_navigasi_dan_halaman_menu_utama_dde09024.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             {/* Sun in top left corner */}
             <div className="absolute top-2 left-3 z-10">
               <CuteSunVector size={70} />
@@ -970,112 +849,71 @@ export default function App() {
               title="Panduan Navigasi"
             />
 
-            {/* Pop-up 3D Tajuk Panduan Navigasi */}
-            <div className="flex justify-center mt-1 mb-2 z-20">
-              <div className="relative px-7 py-2.5 rounded-3xl bg-gradient-to-b from-[#a15c38] to-[#7f4f24] border-4 border-[#582f0e] shadow-[0_6px_0_#432818,0_10px_20px_rgba(0,0,0,0.3)] text-center transform hover:scale-102 transition-transform">
-                <h1 className="text-2xl sm:text-3xl font-heading font-black text-white tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-                  🧭 Panduan Navigasi & Makna Simbol
-                </h1>
-              </div>
-            </div>
+            <div className="flex-1 flex flex-col items-center justify-center my-3 animate-fade-in z-10">
+              {/* Wooden Board showing Symbol Meanings */}
+              <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-[#ddb892] border-4 border-[#7f4f24] shadow-[0_8px_0_#582f0e]">
+                <h2 className="text-3xl sm:text-4xl font-heading font-black text-rose-500 text-center mb-6 drop-shadow-sm">
+                  Makna Simbol
+                </h2>
 
-            {/* Main 2-Column Landscape Stage */}
-            <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-2 z-20 px-2 sm:px-6">
-              {/* LEFT COLUMN: Wooden Board showing Symbol Meanings */}
-              <div className="w-full md:w-7/12 flex flex-col items-center justify-center">
-                <div className="relative max-w-xl w-full p-5 sm:p-6 rounded-3xl bg-[#ddb892]/95 border-4 border-[#7f4f24] shadow-[0_8px_0_#582f0e]">
-                  <h2 className="text-2xl sm:text-3xl font-heading font-black text-rose-500 text-center mb-4 drop-shadow-sm">
-                    Makna Simbol
-                  </h2>
+                <div className="grid grid-cols-2 gap-4 text-sm sm:text-base font-heading font-extrabold text-[#582f0e]">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-lg shadow shrink-0">
+                      <X size={24} strokeWidth={3} />
+                    </span>
+                    <span>keluar</span>
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-3.5 text-xs sm:text-sm font-heading font-extrabold text-[#582f0e]">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center text-base shadow shrink-0">
-                        <X size={20} strokeWidth={3} />
-                      </span>
-                      <span>keluar</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-8 rounded-xl bg-[#e6ccb2] border-2 border-[#7f4f24] text-[#582f0e] flex items-center justify-center text-base shadow shrink-0">
+                      ➔
+                    </span>
+                    <span>halaman seterusnya</span>
+                  </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-7 rounded-xl bg-[#e6ccb2] border-2 border-[#7f4f24] text-[#582f0e] flex items-center justify-center text-sm shadow shrink-0">
-                        ➔
-                      </span>
-                      <span>halaman seterusnya</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-lg shadow shrink-0">
+                      <Home size={22} strokeWidth={2.5} />
+                    </span>
+                    <span>halaman utama</span>
+                  </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center text-base shadow shrink-0">
-                        <Home size={19} strokeWidth={2.5} />
-                      </span>
-                      <span>halaman utama</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-8 rounded-xl bg-[#e6ccb2] border-2 border-[#7f4f24] text-[#582f0e] flex items-center justify-center text-base shadow shrink-0">
+                      ⬅
+                    </span>
+                    <span>halaman sebelumnya</span>
+                  </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-7 rounded-xl bg-[#e6ccb2] border-2 border-[#7f4f24] text-[#582f0e] flex items-center justify-center text-sm shadow shrink-0">
-                        ⬅
-                      </span>
-                      <span>halaman sebelumnya</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center text-lg shadow shrink-0">
+                      <HelpCircle size={22} strokeWidth={2.8} />
+                    </span>
+                    <span>bantuan</span>
+                  </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center text-base shadow shrink-0">
-                        <HelpCircle size={20} strokeWidth={2.8} />
-                      </span>
-                      <span>bantuan</span>
-                    </div>
-
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-9 h-9 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center text-base shadow shrink-0">
-                        <Volume2 size={20} strokeWidth={2.6} />
-                      </span>
-                      <span>audio sebutan</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center text-lg shadow shrink-0">
+                      <Volume2 size={22} strokeWidth={2.6} />
+                    </span>
+                    <span>audio sebutan</span>
                   </div>
                 </div>
               </div>
 
-              {/* RIGHT COLUMN: Karikatur Guru di sebelah kanan + Teacher Switcher */}
-              <div className="w-full md:w-5/12 flex flex-col items-center justify-center shrink-0 z-20">
+              {/* Characters: Boy with binoculars, Selected Teacher Standee & white bunny */}
+              <div className="w-full flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-10 -mb-2 mt-4 gap-3">
+                <div className="hidden sm:block">
+                  <BoyVector pose="binoculars" size={120} />
+                </div>
                 <TeacherStandee
                   teacherId={selectedTeacherId}
-                  size="md"
+                  size="sm"
                   showBubble={true}
-                  bubbleText={`“Fahami makna 6 simbol ini agar mudah mengemudi kit inovasi bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
+                  bubbleText={`“Fahami makna 6 simbol ini agar mudah mengemudi modul bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
-
-                {/* Quick Teacher Switcher Pills */}
-                <div className="flex items-center gap-1 mt-2.5 p-1 bg-white/95 rounded-full border border-amber-300 shadow-md">
-                  {(['syafiqah', 'aaron', 'freshcy'] as TeacherId[]).map((tid) => {
-                    const prof = TEACHER_PROFILES[tid];
-                    const isCur = selectedTeacherId === tid;
-                    return (
-                      <button
-                        key={tid}
-                        onClick={() => handleSelectTeacher(tid)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-heading font-black transition-all flex items-center gap-1 ${
-                          isCur
-                            ? 'bg-amber-500 text-white shadow-xs scale-105'
-                            : 'text-slate-700 hover:bg-amber-100'
-                        }`}
-                        title={`${prof.nama} (${prof.gelaran})`}
-                      >
-                        <span className="w-4 h-4 rounded-full overflow-hidden border border-amber-400 shrink-0 inline-block">
-                          <img src={prof.avatarUrl} alt="" className="w-full h-full object-cover" />
-                        </span>
-                        <span className="hidden sm:inline">{prof.nama.replace('Cikgu ', '')}</span>
-                      </button>
-                    );
-                  })}
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setShowTeacherTrioModal(true);
-                    }}
-                    className="px-2.5 py-1 rounded-full text-[11px] font-heading font-extrabold bg-purple-100 text-purple-900 hover:bg-purple-200 border border-purple-300 ml-0.5"
-                    title="Lihat profil lengkap 3 cikgu"
-                  >
-                    3 Guru 👥
-                  </button>
+                <div className="hidden sm:block">
+                  <BunnyVector size={90} />
                 </div>
               </div>
             </div>
@@ -1106,14 +944,7 @@ export default function App() {
             SCREEN 4: HALAMAN UTAMA (Storyboard Page 4)
            ======================================================== */}
         {currentScreen === 'home' && (
-          <div
-            className="relative min-h-[600px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-4 sm:p-6 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.22), rgba(255,255,255,0.3)), url('/assets/aistudio/halaman_panduan_navigasi_dan_halaman_menu_utama_dde09024.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[600px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             {/* Flying bird in sky */}
             <div className="absolute top-4 left-1/3 z-10">
               <BlueBirdVector size={42} />
@@ -1240,14 +1071,7 @@ export default function App() {
             SCREEN 5 & 6: PENGENALAN (Storyboard Pages 5 & 6)
            ======================================================== */}
         {currentScreen === 'intro' && (
-          <div
-            className="relative min-h-[600px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-4 sm:p-6 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.28), rgba(255,255,255,0.36)), url('/assets/aistudio/halaman_panduan_navigasi_dan_halaman_menu_utama_dde09024.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[600px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             <TopNavBar
               onExit={() => setCurrentScreen('home')}
               onHome={() => setCurrentScreen('home')}
@@ -1368,14 +1192,7 @@ export default function App() {
             SCREEN 7: JOM BELAJAR MENU (Storyboard Page 7)
            ======================================================== */}
         {currentScreen === 'learn_menu' && (
-          <div
-            className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-4 sm:p-6 animate-fade-in bg-cover bg-center"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0.32)), url('/assets/aistudio/halaman_panduan_navigasi_dan_halaman_menu_utama_dde09024.jpg')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
+          <div className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
             {/* Flying butterfly matching Page 7 */}
             <div className="absolute top-20 left-16 z-10">
               <ButterflyVector size={42} />
@@ -1391,7 +1208,7 @@ export default function App() {
             />
 
             <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-4 z-10">
-              {/* Left Side: Selected Teacher Standee */}
+              {/* Left Side: Selected Teacher Standee & Explorer Boy */}
               <div className="flex flex-col items-center">
                 <TeacherStandee
                   teacherId={selectedTeacherId}
@@ -1399,6 +1216,10 @@ export default function App() {
                   showBubble={true}
                   bubbleText={`“Sila pilih bahagian yang ingin anda terokai bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
+                <div className="hidden sm:flex items-center gap-2 mt-2">
+                  <BoyVector pose="magnify" size={80} />
+                  <CatVector size={60} />
+                </div>
               </div>
 
               {/* Right Side: Wooden Directional Signpost matching Page 7 */}
@@ -1523,6 +1344,9 @@ export default function App() {
                     <span className="text-xs font-heading font-black text-amber-950">
                       {TEACHER_PROFILES[selectedTeacherId].nama}
                     </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-300">
+                      {TEACHER_PROFILES[selectedTeacherId].gelaran}
+                    </span>
                   </div>
                   <p className="text-[11px] text-slate-700 font-medium leading-snug mt-0.5">
                     “Pilih permainan kegemaran anda dan kumpul sebanyak mungkin syiling emas!”
@@ -1570,7 +1394,7 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Game 2 Card: Game Kembara Harta Karun */}
+                {/* Game 2 Card: Permainan Harta Karun matching Page 24 */}
                 <div
                   onClick={() => {
                     sound.playClick();
@@ -1579,19 +1403,19 @@ export default function App() {
                   className="p-4 rounded-3xl bg-gradient-to-b from-amber-50 to-amber-100 border-4 border-amber-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
                 >
                   <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-600 text-white uppercase tracking-wider mb-1">
-                    Permainan 2 🪙
+                    Permainan 2
                   </span>
                   <TreasureChestVector isOpen={true} size={95} />
                   <div className="mt-1">
                     <h3 className="font-heading font-black text-lg text-amber-950">
-                      Game Kembara Harta Karun
+                      Harta Karun
                     </h3>
                     <p className="text-[11px] text-amber-800 font-semibold mt-0.5">
                       7 Soalan · Masukkan syiling emas yang tepat ke peti lanun!
                     </p>
                   </div>
                   <button className="mt-2 px-4 py-1.5 rounded-2xl bg-amber-600 text-white font-heading font-bold text-xs shadow">
-                    Kembara Harta Karun 🪙
+                    Buka Peti Emas 🪙
                   </button>
                 </div>
 
@@ -1625,7 +1449,7 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Game 4 Card: Game Kuasa Pac-Man */}
+                {/* Game 4 Card: Wira Pac-Man Ayat Perintah */}
                 <div
                   onClick={() => {
                     sound.playClick();
@@ -1647,14 +1471,14 @@ export default function App() {
                   </div>
                   <div className="mt-1">
                     <h3 className="font-heading font-black text-lg text-yellow-400">
-                      Game Kuasa Pac-Man
+                      Wira Pac-Man
                     </h3>
                     <p className="text-[11px] text-yellow-200/90 font-semibold mt-0.5">
                       Labirin Retro · Makan bintang kuasa dan kuasai ayat perintah!
                     </p>
                   </div>
                   <button className="mt-2 px-4 py-1.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-heading font-black text-xs shadow">
-                    Kuasai Pac-Man 🟡
+                    Makan Bintang ⭐
                   </button>
                 </div>
               </div>

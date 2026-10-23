@@ -61,15 +61,14 @@ export const TopNavBar: React.FC<{
             onToggleSound();
           }}
           aria-label={soundEnabled ? "Bunyi Hidup" : "Bunyi Senyap"}
-          title={soundEnabled ? "Lagu Nintendo Café: AKTIF (Tekan untuk bisu)" : "Lagu Latar: BISU (Tekan untuk mainkan lagu)"}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-full shadow-lg border-2 border-white transition-all text-xs font-heading font-black cursor-pointer ${
+          title={soundEnabled ? "Bunyi Hidup" : "Bunyi Senyap"}
+          className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all ${
             soundEnabled
               ? 'bg-amber-400 text-amber-950 hover:bg-amber-500'
               : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
           }`}
         >
-          {soundEnabled ? <Volume2 size={20} strokeWidth={2.8} /> : <VolumeX size={20} strokeWidth={2.8} />}
-          <span className="hidden sm:inline">{soundEnabled ? '🎵 Muzik BGM' : '🔇 Bisu'}</span>
+          {soundEnabled ? <Volume2 size={24} strokeWidth={2.6} /> : <VolumeX size={24} strokeWidth={2.6} />}
         </button>
 
         {onHelp && (
@@ -168,22 +167,14 @@ export const AudioSpeakerButton: React.FC<{
   size?: 'sm' | 'md' | 'lg';
   label?: string;
   className?: string;
-  persona?: 'syafiqah' | 'aaron' | 'freshcy' | 'neutral';
-}> = ({ textToSpeak, size = 'md', label, className = '', persona }) => {
+}> = ({ textToSpeak, size = 'md', label, className = '' }) => {
   const [speaking, setSpeaking] = React.useState(false);
-
-  React.useEffect(() => {
-    const unsubscribe = sound.onSpeechStateChange((isSpeaking) => {
-      setSpeaking(isSpeaking);
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    sound.speakMalay(textToSpeak, persona);
+    sound.speakMalay(textToSpeak);
+    setSpeaking(true);
+    setTimeout(() => setSpeaking(false), 3500);
   };
 
   const sizeClasses = {

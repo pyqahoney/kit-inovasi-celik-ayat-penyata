@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { TopNavBar, WoodArrowButton } from './OrganicNav';
+import { TopNavBar, AudioSpeakerButton } from './OrganicNav';
 import { sound } from '../utils/audio';
-import { ArrowLeft, ArrowRight, ArrowUp, Sparkles, Volume2, Award, Heart, HelpCircle, Trophy, BookOpen, Gamepad2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, Sparkles, Volume2, Award, Heart, HelpCircle, Trophy } from 'lucide-react';
 
 interface MarioGameProps {
   onBack: () => void;
@@ -127,9 +127,6 @@ export const MarioGame: React.FC<MarioGameProps> = ({
   soundEnabled,
   onToggleSound
 }) => {
-  // Navigation stage: intro -> rules -> guide -> playing
-  const [subStage, setSubStage] = useState<'intro' | 'rules' | 'guide' | 'playing'>('intro');
-
   // Mario physics & state
   const [posX, setPosX] = useState(60);
   const [posY, setPosY] = useState(250); // Ground level
@@ -495,163 +492,8 @@ export const MarioGame: React.FC<MarioGameProps> = ({
         title="Wira Mario: Ayat Perintah"
       />
 
-      {/* Screen 1: Pengenalan Wira Mario */}
-      {subStage === 'intro' && (
-        <div
-          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/assets/aistudio/halaman_game_mario_d28103bf.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="flex-1 flex flex-col items-center justify-center text-center max-w-xl mx-auto z-10">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-rose-600 via-red-500 to-amber-400 border-4 border-white shadow-2xl flex items-center justify-center text-4xl mb-4 animate-bounce">
-              🍄
-            </div>
-
-            <div className="bg-white/95 backdrop-blur-md p-6 rounded-3xl border-4 border-amber-400 shadow-2xl">
-              <h1 className="text-3xl sm:text-4xl font-heading font-black text-rose-600 drop-shadow-sm uppercase tracking-wide">
-                Wira Mario
-              </h1>
-              <span className="inline-block mt-1 px-3 py-1 bg-amber-200 text-amber-950 rounded-full text-xs font-heading font-black">
-                Misi Tatabahasa: Ayat Perintah
-              </span>
-              <p className="text-slate-800 text-sm sm:text-base font-semibold mt-3 leading-relaxed">
-                Bantu Wira Mario mengembara di Lembah Bahasa Dunia 1-1! Kutip syiling emas, tanduk blok tanda soal [?], dan kuasai 4 jenis ayat perintah untuk membuka pintu Istana Bahasa!
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <button
-                onClick={() => {
-                  sound.playSuccess();
-                  setSubStage('rules');
-                }}
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-b from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-heading font-black text-base shadow-[0_5px_0_#7f1d1d] active:translate-y-1 transition-all flex items-center gap-2"
-              >
-                <Gamepad2 size={20} />
-                <span>Mula Misi 🍄</span>
-              </button>
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setSubStage('rules');
-                }}
-                className="px-5 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-amber-950 font-heading font-black text-sm shadow-[0_5px_0_#b45309] active:translate-y-1 transition-all flex items-center gap-2"
-              >
-                <BookOpen size={18} />
-                <span>Cara Bermain</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Screen 2: Cara Bermain Wira Mario */}
-      {subStage === 'rules' && (
-        <div
-          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url('/assets/aistudio/halaman_game_mario_d28103bf.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="flex-1 flex flex-col items-center justify-center my-2 z-10">
-            <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-[#ddb892]/95 border-4 border-[#7f4f24] shadow-[0_8px_0_#582f0e]">
-              <div className="absolute -top-5 left-8 w-3 h-8 bg-[#7f4f24] rounded-full" />
-              <div className="absolute -top-5 right-8 w-3 h-8 bg-[#7f4f24] rounded-full" />
-
-              <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#582f0e] text-center mb-4">
-                Cara Bermain
-              </h2>
-
-              <div className="space-y-3 text-sm sm:text-base font-bold text-[#432818]">
-                <div className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">1</span>
-                  <p>Gunakan butang <strong>KIRI</strong> dan <strong>KANAN</strong> (atau kekunci anak panah papan kekunci) untuk menggerakkan Mario.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">2</span>
-                  <p>Tekan butang <strong>LOMPAT</strong> atau kekunci <strong>SPACE / ⬆</strong> untuk melompat tinggi.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">3</span>
-                  <p>Tanduk bahagian bawah <strong>Blok Tanda Soal [?]</strong> untuk membuka soalan ayat perintah.</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">4</span>
-                  <p>Kutip syiling emas di udara dan selesaikan semua blok soalan untuk masuk ke <strong>Istana Bahasa</strong>!</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Screen 3: Panduan untuk Murid */}
-      {subStage === 'guide' && (
-        <div
-          className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url('/assets/aistudio/halaman_game_mario_d28103bf.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="flex-1 flex flex-col items-center justify-center my-2 z-10">
-            <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-[#ddb892]/95 border-4 border-[#7f4f24] shadow-[0_8px_0_#582f0e]">
-              <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#582f0e] text-center mb-5">
-                Panduan untuk Murid
-              </h2>
-
-              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm font-bold text-[#582f0e]">
-                <div className="flex flex-col items-center p-3 bg-white/90 rounded-2xl border-2 border-amber-400 text-center shadow-sm">
-                  <div className="w-10 h-10 rounded-lg bg-amber-400 border-2 border-amber-600 flex items-center justify-center font-black text-xl text-amber-950 mb-1">
-                    ?
-                  </div>
-                  <span className="font-heading font-black">Blok [?]</span>
-                  <span className="text-[11px] text-slate-700 mt-0.5">Mengandungi soalan ayat perintah</span>
-                </div>
-
-                <div className="flex flex-col items-center p-3 bg-white/90 rounded-2xl border-2 border-amber-400 text-center shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-yellow-300 border-2 border-amber-500 flex items-center justify-center font-black text-xl text-amber-950 mb-1">
-                    🪙
-                  </div>
-                  <span className="font-heading font-black">Syiling Emas</span>
-                  <span className="text-[11px] text-slate-700 mt-0.5">+1 syiling untuk setiap kutipan</span>
-                </div>
-
-                <div className="flex flex-col items-center p-3 bg-white/90 rounded-2xl border-2 border-amber-400 text-center shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-amber-400 border-2 border-white flex items-center justify-center font-black text-xl text-amber-950 mb-1">
-                    ⭐
-                  </div>
-                  <span className="font-heading font-black">Super Star</span>
-                  <span className="text-[11px] text-slate-700 mt-0.5">Bonus +100 mata kuasa</span>
-                </div>
-
-                <div className="flex flex-col items-center p-3 bg-white/90 rounded-2xl border-2 border-amber-400 text-center shadow-sm">
-                  <div className="w-10 h-10 rounded-lg bg-rose-600 border-2 border-rose-800 flex items-center justify-center font-black text-xl text-white mb-1">
-                    🏰
-                  </div>
-                  <span className="font-heading font-black">Istana Bahasa</span>
-                  <span className="text-[11px] text-slate-700 mt-0.5">Garisan penamat kemenangan</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Screen 4: Main Mario Game Board */}
-      {subStage === 'playing' && (
-      <div
-        className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl flex flex-col justify-between h-[440px] sm:h-[480px] md:h-[500px] lg:h-[560px] xl:h-[600px] md:aspect-[16/9] select-none"
-        style={{
-          background: 'linear-gradient(to bottom, #5c94fc 0%, #6ba5fc 70%, #90c0fc 100%)'
-        }}
-      >
+      {/* Main Mario Game Board (Landscape on Desktop 16:9, Portrait on Phone) */}
+      <div className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl bg-[#5c94fc] flex flex-col justify-between h-[440px] sm:h-[480px] md:h-[500px] lg:h-[560px] xl:h-[600px] md:aspect-[16/9] select-none">
         {/* Retro Status HUD Header (Score, Coins, World, Lives) */}
         <div className="relative z-30 bg-black/75 backdrop-blur-sm px-3 sm:px-4 py-2 flex items-center justify-between text-white font-mono text-xs sm:text-sm border-b-2 border-amber-400">
           <div className="flex items-center gap-1.5 font-bold text-amber-300">
@@ -990,7 +832,6 @@ export const MarioGame: React.FC<MarioGameProps> = ({
           </div>
         </div>
       </div>
-      )}
 
       {/* POPUP MODAL: Cabaran Ayat Perintah apabila Mario menyentuh Blok [?] */}
       {activeQuestion && (
@@ -1016,6 +857,9 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               <p className="text-base sm:text-lg font-heading font-black text-slate-900 leading-snug">
                 {activeQuestion.soalan}
               </p>
+              <div className="mt-2 flex justify-center">
+                <AudioSpeakerButton textToSpeak={activeQuestion.ayatPenuh} size="sm" />
+              </div>
             </div>
 
             {/* Multiple Choice Options */}
@@ -1149,44 +993,6 @@ export const MarioGame: React.FC<MarioGameProps> = ({
           </div>
         </div>
       )}
-
-      {/* Bottom Navigation Buttons */}
-      <div className="flex items-center justify-between w-full pt-2 z-10">
-        <WoodArrowButton
-          direction="prev"
-          onClick={() => {
-            if (subStage === 'rules') setSubStage('intro');
-            else if (subStage === 'guide') setSubStage('rules');
-            else if (subStage === 'playing') setSubStage('guide');
-          }}
-          disabled={subStage === 'intro'}
-        />
-
-        <div className="text-xs font-bold text-amber-900 bg-amber-200/90 px-4 py-1.5 rounded-full shadow-sm">
-          {subStage === 'intro' && 'Pengenalan (Wira Mario)'}
-          {subStage === 'rules' && 'Cara Bermain'}
-          {subStage === 'guide' && 'Panduan Murid'}
-          {subStage === 'playing' && `Dunia 1-1 (Markah: ${score})`}
-        </div>
-
-        <WoodArrowButton
-          direction="next"
-          onClick={() => {
-            if (subStage === 'intro') setSubStage('rules');
-            else if (subStage === 'rules') setSubStage('guide');
-            else if (subStage === 'guide') setSubStage('playing');
-            else if (subStage === 'playing') {
-              if (blocks.every((b) => b.answered)) {
-                triggerVictory();
-              } else {
-                setShowCastleLocked(true);
-                setTimeout(() => setShowCastleLocked(false), 3000);
-              }
-            }
-          }}
-          label={subStage === 'guide' ? 'Mula Main' : undefined}
-        />
-      </div>
     </div>
   );
 };
